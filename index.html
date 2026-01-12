@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Starlight Language Documentation</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+  <meta charset="UTF-8">
+  <title>Starlight Documentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
   <!-- Markdown parser -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <style>
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       margin: 0;
-      padding: 3rem;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 2rem;
+      background: #f8fafc;
+      color: #111827;
       line-height: 1.6;
-      background: #ffffff;
-      color: #0f172a;
     }
 
-    h1, h2, h3 {
+    h1, h2, h3, h4, h5, h6 {
       border-bottom: 1px solid #e5e7eb;
       padding-bottom: 0.3rem;
-      margin-top: 3rem;
+      margin-top: 2rem;
     }
 
     pre {
@@ -29,7 +29,7 @@
       color: #e5e7eb;
       padding: 1rem;
       overflow-x: auto;
-      border-radius: 6px;
+      border-radius: 5px;
     }
 
     code {
@@ -38,74 +38,77 @@
       border-radius: 4px;
     }
 
-    hr {
-      margin: 4rem 0;
+    a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
 
 <div id="content">
-  <h1>🌟 Starlight Programming Language</h1>
-  <p>Loading documentation…</p>
+  <h1>Starlight Documentation</h1>
+  <p>Loading all documentation...</p>
 </div>
 
 <script>
+(async () => {
+  const contentDiv = document.getElementById('content');
+
+  // All Markdown files in your repo
   const files = [
     // Docs
-    "docs/introduction.md",
-    "docs/getting-started.md",
-    "docs/installation.md",
-    "docs/syntax-overview.md",
-    "docs/variables.md",
-    "docs/data-types.md",
-    "docs/control-flow.md",
-    "docs/functions.md",
-    "docs/arrays.md",
-    "docs/objects.md",
-    "docs/modules.md",
-    "docs/async-await.md",
-    "docs/cli.md",
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/docs/introduction.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/docs/getting-started.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/docs/installation.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/docs/syntax-overview.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/docs/variables.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/docs/data-types.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/docs/control-flow.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/docs/functions.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/docs/arrays.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/docs/objects.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/docs/modules.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/docs/async-await.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/docs/cli.md',
 
     // Packages
-    "packages/starlight-math.md",
-    "packages/starlight-fs.md",
-    "packages/starlight-time.md",
-    "packages/starlight-color.md",
-    "packages/starlight-txt-to-pdf.md",
-    "packages/wiki-starlight-api.md",
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/packages/starlight-math.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/packages/starlight-fs.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/packages/starlight-time.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/packages/starlight-color.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/packages/starlight-txt-to-pdf.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/packages/wiki-starlight-api.md',
 
     // Specification
-    "spec/language-spec.md",
-    "spec/keywords.md",
-    "spec/operators.md",
-    "spec/runtime-model.md",
-    "spec/builtins.md",
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/spec/language-spec.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/spec/keywords.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/spec/operators.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/spec/runtime-model.md',
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/spec/builtins.md',
 
     // Developer
-    "developer/biography.md"
+    'https://raw.githubusercontent.com/developerdominex/developerdominex/main/developer/biography.md'
   ];
 
-  async function loadAll() {
-    const container = document.getElementById("content");
-    container.innerHTML = "";
+  contentDiv.innerHTML = '<h1>Starlight Documentation</h1>';
 
-    for (const file of files) {
-      try {
-        const res = await fetch(file);
-        if (!res.ok) continue;
-
-        const md = await res.text();
-        const section = document.createElement("section");
-        section.innerHTML = marked.parse(md) + "<hr />";
-        container.appendChild(section);
-      } catch {
-        console.warn("Failed to load:", file);
-      }
+  for (const url of files) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      const md = await res.text();
+      const html = marked.parse(md);
+      contentDiv.innerHTML += html;
+    } catch (err) {
+      console.error('Failed to load', url, err);
     }
   }
-
-  loadAll();
+})();
 </script>
 
 </body>
