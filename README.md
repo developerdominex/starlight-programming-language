@@ -119,7 +119,4 @@ MIT License © Macedon
 * **CLI Package:** [https://www.npmjs.com/package/starlight-cli](https://www.npmjs.com/package/starlight-cli)
 * **Source Repository:** [https://github.com/](https://github.com/)<your-username>/starlight-programming-language
 
-```
 
-Just tell me 👍
-```
