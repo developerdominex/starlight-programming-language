@@ -69,6 +69,7 @@ We appreciate responsible disclosure and will acknowledge contributors when appr
 
 ---
 
-**Maintainer:** Macedon  
+**Maintainer:** Dominex Macedon  
 **Project:** Starlight Programming Language  
 **License:** MIT
+
