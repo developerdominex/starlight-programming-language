@@ -2,7 +2,7 @@
 # 🌟 Starlight Programming Language
 
 **Starlight** is a lightweight, modern scripting language designed for **server-side scripting**, **CLI tools**, and **automation**.  
-It focuses on simplicity, readable syntax, and practical features for everyday programming.
+It focuses on simplicity, readable syntax, and practical features for everyday programming. starlight-cli was officially released on December 14 2025.
 
 ---
 
