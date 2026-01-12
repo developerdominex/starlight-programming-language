@@ -1,1 +1,138 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Starlight Documentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Markdown parser -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- Basic styling -->
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      height: 100vh;
+    }
+
+    nav {
+      width: 280px;
+      background: #0f172a;
+      color: #e5e7eb;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+
+    nav h2 {
+      font-size: 14px;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-top: 1.5rem;
+    }
+
+    nav a {
+      display: block;
+      color: #e5e7eb;
+      text-decoration: none;
+      padding: 6px 0;
+      font-size: 14px;
+    }
+
+    nav a:hover {
+      color: #38bdf8;
+    }
+
+    main {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    main h1, main h2, main h3 {
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 4px;
+    }
+
+    pre {
+      background: #0f172a;
+      color: #e5e7eb;
+      padding: 1rem;
+      overflow-x: auto;
+    }
+
+    code {
+      background: #f1f5f9;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <h1>🌟 Starlight</h1>
+
+  <h2>Docs</h2>
+  <a href="#" onclick="loadMD('docs/introduction.md')">Introduction</a>
+  <a href="#" onclick="loadMD('docs/getting-started.md')">Getting Started</a>
+  <a href="#" onclick="loadMD('docs/installation.md')">Installation</a>
+  <a href="#" onclick="loadMD('docs/syntax-overview.md')">Syntax Overview</a>
+  <a href="#" onclick="loadMD('docs/variables.md')">Variables</a>
+  <a href="#" onclick="loadMD('docs/data-types.md')">Data Types</a>
+  <a href="#" onclick="loadMD('docs/control-flow.md')">Control Flow</a>
+  <a href="#" onclick="loadMD('docs/functions.md')">Functions</a>
+  <a href="#" onclick="loadMD('docs/arrays.md')">Arrays</a>
+  <a href="#" onclick="loadMD('docs/objects.md')">Objects</a>
+  <a href="#" onclick="loadMD('docs/modules.md')">Modules</a>
+  <a href="#" onclick="loadMD('docs/async-await.md')">Async / Await</a>
+  <a href="#" onclick="loadMD('docs/cli.md')">CLI</a>
+
+  <h2>Packages</h2>
+  <a href="#" onclick="loadMD('packages/starlight-math.md')">starlight-math</a>
+  <a href="#" onclick="loadMD('packages/starlight-fs.md')">starlight-fs</a>
+  <a href="#" onclick="loadMD('packages/starlight-time.md')">starlight-time</a>
+  <a href="#" onclick="loadMD('packages/starlight-color.md')">starlight-color</a>
+  <a href="#" onclick="loadMD('packages/starlight-txt-to-pdf.md')">txt-to-pdf</a>
+  <a href="#" onclick="loadMD('packages/wiki-starlight-api.md')">wiki-api</a>
+
+  <h2>Specification</h2>
+  <a href="#" onclick="loadMD('spec/language-spec.md')">Language Spec</a>
+  <a href="#" onclick="loadMD('spec/keywords.md')">Keywords</a>
+  <a href="#" onclick="loadMD('spec/operators.md')">Operators</a>
+  <a href="#" onclick="loadMD('spec/runtime-model.md')">Runtime Model</a>
+  <a href="#" onclick="loadMD('spec/builtins.md')">Built-ins</a>
+
+  <h2>Developer</h2>
+  <a href="#" onclick="loadMD('developer/biography.md')">Maintainer</a>
+</nav>
+
+<main id="content">
+  <h1>Welcome to Starlight</h1>
+  <p>Select a document from the sidebar.</p>
+</main>
+
+<script>
+  async function loadMD(path) {
+    const res = await fetch(path);
+    if (!res.ok) {
+      document.getElementById("content").innerHTML =
+        "<h2>Error</h2><p>Could not load document.</p>";
+      return;
+    }
+
+    const md = await res.text();
+    document.getElementById("content").innerHTML = marked.parse(md);
+    history.replaceState(null, "", "#"+path);
+  }
+
+  // Load from URL hash if present
+  if (location.hash) {
+    loadMD(location.hash.substring(1));
+  }
+</script>
+
+</body>
+</html>
