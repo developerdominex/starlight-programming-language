@@ -1,71 +1,74 @@
-**name:** dominex macedon  
-**date of birth:** march 21, 2006 *(the same day as the first tweet)*  
-**mother:** daw thet thet maw  
-**father:** u kyaw moe  
+# Developer / Maintainer Biography
+
+**Name:** Dominex Macedon
+**Date of Birth:** March 21, 2006 *(the same day as the first tweet)*
+**Mother:** Daw Thet Thet Maw
+**Father:** U Kyaw Moe
 
 ---
 
-## early inspiration
+## Early Inspiration
 
-from an early age, i was fascinated by technology and problem-solving. my journey started with a simple goal: **to make my father's job easier**. observing his work, i realized that customers often had to meet him in person to submit items, which was time-consuming. i wanted to create a solution that would allow customers to communicate and submit requests without physically visiting him.  
+From an early age, I was fascinated by technology and problem-solving. My journey started with a simple goal: **to make my father's job easier**. Observing his work, I realized that customers often had to meet him in person to submit items, which was time-consuming. I wanted to create a solution that would allow customers to communicate and submit requests without physically visiting him.
 
-this led me to develop a **local chat system** using **mysql, php, html, and css**. the project was small but significant. i immediately understood that **if a group of people could contact a single person, i could build a one-to-one chat interface**. i implemented it, and it worked, marking my first success in building functional communication systems.
-
----
-
-## web development and github
-
-after creating the local chat system, i expanded my skills into **web development**. using **github**, i hosted projects and began experimenting with website creation and deployment. these early experiences helped me understand version control, collaboration, and project management in real-world software development.
+This led me to develop a **local chat system** using **MySQL, PHP, HTML, and CSS**. The project was small but significant. I immediately understood that **if a group of people could contact a single person, I could build a one-to-one chat interface**. I implemented it, and it worked, marking my first success in building functional communication systems.
 
 ---
 
-## android development: falcon s
+## Web Development and GitHub
 
-later, i ventured into **android development** and built a **messaging app called Falcon S**. this project used **android studio**, **firebase auth**, **realtime db**, **firestore**, and **storage**. the journey was challenging:
-
-- dealing with **long gradle builds**  
-- correctly adding **google-services.json**, a notoriously difficult part of android development  
-- generating **keystores** and ensuring **version codes** matched  
-
-through persistence, i successfully built the app, gaining deep experience in mobile application architecture, authentication, and real-time data management.
+After creating the local chat system, I expanded my skills into **web development**. Using **GitHub**, I hosted projects and began experimenting with website creation and deployment. These early experiences helped me understand version control, collaboration, and project management in real-world software development.
 
 ---
 
-## desktop and video call applications
+## Android Development: Falcon S
 
-to expand communication tools, i developed a **video call room** similar to **Zoom**:
+Later, I ventured into **Android development** and built a **messaging app called Falcon S**. This project used **Android Studio**, **Firebase Auth**, **Realtime DB**, **Firestore**, and **Storage**. The journey was challenging:
 
-- **desktop**: using **Electron**  
-- **android app**: using **WebView**  
-- **signaling server**: using **Supabase**  
+* Dealing with **long Gradle builds**
+* Correctly adding **google-services.json**, a notoriously difficult part of Android development
+* Generating **keystores** and ensuring **version codes** matched
 
-this project tested my ability to integrate cross-platform systems and manage real-time communication at scale.
-
----
-
-## rendering engine and react native
-
-next, i attempted to create a **rendering engine** to render **views directly from JSON**. though this project ultimately failed, it taught me valuable lessons about design systems, parsing, and dynamic UI rendering.  
-
-afterwards, i moved to **React Native and Expo**, successfully rebuilding a messaging app with a **CSS-like stylesheet design**. this solidified my understanding of cross-platform mobile development and modern UI frameworks.
+Through persistence, I successfully built the app, gaining deep experience in mobile application architecture, authentication, and real-time data management.
 
 ---
 
-## starlight programming language
+## Desktop and Video Call Applications
 
-finally, my experiences led me to develop the **Starlight Programming Language**.  
-Starlight is **based on the rendering engine concept** I had explored earlier, combining ideas from my web, mobile, and desktop projects to create a language that is **flexible, interactive, and user-friendly**.  
+To expand communication tools, I developed a **video call room** similar to **Zoom**:
 
-my work with Starlight continues to evolve, reflecting my passion for **communication systems, rendering engines, and innovative programming tools**.
+* **Desktop:** using **Electron**
+* **Android app:** using **WebView**
+* **Signaling server:** using **Supabase**
+
+This project tested my ability to integrate cross-platform systems and manage real-time communication at scale.
 
 ---
 
-## summary
+## Rendering Engine and React Native
 
-throughout my journey:
+Next, I attempted to create a **rendering engine** to render **views directly from JSON**. Though this project ultimately failed, it taught me valuable lessons about design systems, parsing, and dynamic UI rendering.
 
-- i have built **local chat systems, websites, android apps, and desktop apps**  
-- i have faced and solved challenges in **authentication, real-time databases, keystores, gradle builds, signaling servers, and UI rendering**  
-- i have learned that **persistence, experimentation, and understanding user needs** are the keys to successful development  
+Afterwards, I moved to **React Native and Expo**, successfully rebuilding a messaging app with a **CSS-like stylesheet design**. This solidified my understanding of cross-platform mobile development and modern UI frameworks.
 
-I am dominex macedon, a **developer, innovator, and creator**, dedicated to building tools that make communication seamless and intuitive.
+---
+
+## Starlight Programming Language
+
+Finally, my experiences led me to develop the **Starlight Programming Language**.
+Starlight is **based on the rendering engine concept** I had explored earlier, combining ideas from my web, mobile, and desktop projects to create a language that is **flexible, interactive, and user-friendly**.
+
+My work with Starlight continues to evolve, reflecting my passion for **communication systems, rendering engines, and innovative programming tools**.
+
+---
+
+## Summary
+
+Throughout my journey:
+
+* I have built **local chat systems, websites, Android apps, and desktop apps**
+* I have faced and solved challenges in **authentication, real-time databases, keystores, Gradle builds, signaling servers, and UI rendering**
+* I have learned that **persistence, experimentation, and understanding user needs** are the keys to successful development
+
+I am **Dominex Macedon**, a **developer, innovator, and creator**, dedicated to building tools that make communication seamless and intuitive.
+
