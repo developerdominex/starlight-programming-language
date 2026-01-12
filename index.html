@@ -2,46 +2,42 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Starlight Documentation</title>
+  <title>🌟 Starlight Documentation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
+  
   <!-- Markdown parser -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
+  
+  <!-- Basic styling -->
   <style>
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f9fafb;
-      color: #111827;
       margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       padding: 2rem;
+      background: #f8fafc;
+      color: #0f172a;
       line-height: 1.6;
     }
-
     h1, h2, h3, h4 {
       border-bottom: 1px solid #e5e7eb;
-      padding-bottom: 0.2em;
-      margin-top: 1.5em;
+      padding-bottom: 4px;
+      margin-top: 2rem;
     }
-
     pre {
-      background: #1f2937;
-      color: #f9fafb;
-      padding: 1em;
+      background: #0f172a;
+      color: #e5e7eb;
+      padding: 1rem;
       overflow-x: auto;
-      border-radius: 5px;
     }
-
     code {
-      background: #e5e7eb;
-      padding: 2px 5px;
+      background: #f1f5f9;
+      padding: 2px 4px;
       border-radius: 4px;
     }
-
     hr {
+      border: none;
+      border-top: 1px solid #e5e7eb;
       margin: 2rem 0;
-      border: 0;
-      border-top: 1px solid #d1d5db;
     }
   </style>
 </head>
@@ -51,59 +47,65 @@
 <p>This page loads all Markdown files in the repo sequentially.</p>
 <hr>
 
-<div id="content"></div>
+<main id="content">
+  <p>Loading documentation...</p>
+</main>
 
 <script>
+  // All Markdown files (raw URLs on GitHub)
   const mdFiles = [
     // Docs
-    'docs/introduction.md',
-    'docs/getting-started.md',
-    'docs/installation.md',
-    'docs/syntax-overview.md',
-    'docs/variables.md',
-    'docs/data-types.md',
-    'docs/control-flow.md',
-    'docs/functions.md',
-    'docs/arrays.md',
-    'docs/objects.md',
-    'docs/modules.md',
-    'docs/async-await.md',
-    'docs/cli.md',
-
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/docs/introduction.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/docs/getting-started.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/docs/installation.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/docs/syntax-overview.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/docs/variables.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/docs/data-types.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/docs/control-flow.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/docs/functions.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/docs/arrays.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/docs/objects.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/docs/modules.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/docs/async-await.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/docs/cli.md',
+    
     // Packages
-    'packages/starlight-math.md',
-    'packages/starlight-fs.md',
-    'packages/starlight-time.md',
-    'packages/starlight-color.md',
-    'packages/starlight-txt-to-pdf.md',
-    'packages/wiki-starlight-api.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/packages/starlight-math.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/packages/starlight-fs.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/packages/starlight-time.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/packages/starlight-color.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/packages/starlight-txt-to-pdf.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/packages/wiki-starlight-api.md',
 
-    // Spec
-    'spec/language-spec.md',
-    'spec/keywords.md',
-    'spec/operators.md',
-    'spec/runtime-model.md',
-    'spec/builtins.md',
+    // Specification
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/spec/language-spec.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/spec/keywords.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/spec/operators.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/spec/runtime-model.md',
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/spec/builtins.md',
 
     // Developer
-    'developer/biography.md'
+    'https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/developer/biography.md'
   ];
 
-  const container = document.getElementById('content');
+  const contentEl = document.getElementById('content');
 
   async function loadAllMD() {
-    for (let file of mdFiles) {
+    contentEl.innerHTML = ''; // clear "Loading"
+    for (const file of mdFiles) {
       try {
         const res = await fetch(file);
-        if (!res.ok) {
-          container.innerHTML += `<h2>Error loading ${file}</h2>`;
-          continue;
-        }
+        if (!res.ok) throw new Error();
         const md = await res.text();
-        container.innerHTML += marked.parse(md);
-        container.innerHTML += '<hr>';
+        const section = document.createElement('section');
+        section.innerHTML = marked.parse(md);
+        contentEl.appendChild(section);
+        contentEl.appendChild(document.createElement('hr'));
       } catch (e) {
-        container.innerHTML += `<h2>Error loading ${file}</h2>`;
+        const error = document.createElement('p');
+        error.textContent = `Error loading ${file}`;
+        error.style.color = 'red';
+        contentEl.appendChild(error);
       }
     }
   }
