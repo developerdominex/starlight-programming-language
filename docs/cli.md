@@ -13,7 +13,7 @@ starlight comes with a command line interface (cli) to run code, open learning g
 ```bash
 starlight <file.sl>        # run a starlight source file
 starlight <file.md>        # view a markdown file directly in browser
-starlight -v               # show cli version
+starlight -version         # show cli version
 starlight --help           # show help
 starlight --learn          # open learning guide
 starlight --writedirectly  # interactive editor mode
@@ -96,4 +96,5 @@ sldeploy x + y   # outputs 15
 * temporary files automatically cleaned up after execution.
 * markdown files render beautifully in dark theme html.
 * cross-platform support for opening files and urls.
+
 
