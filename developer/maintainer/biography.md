@@ -1,5 +1,5 @@
 # Developer / Maintainer Biography
-
+![Dominex Macedon](dominexmacedon.jpg)
 **Name:** Dominex Macedon
 **Date of Birth:** March 21, 2006 *(the same day as the first tweet)*
 **Mother:** Daw Thet Thet Maw
