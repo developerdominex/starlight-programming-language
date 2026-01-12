@@ -1,0 +1,74 @@
+Program        = { Statement } ;
+
+Statement      = VarDeclaration
+               | FuncDeclaration
+               | AsyncFuncDeclaration
+               | IfStatement
+               | WhileStatement
+               | ForStatement
+               | DoTrackStatement
+               | StartStatement
+               | BreakStatement
+               | ContinueStatement
+               | ReturnStatement
+               | SldeployStatement
+               | DefineStatement
+               | ImportStatement
+               | ExpressionStatement
+               | BlockStatement ;
+
+VarDeclaration = "LET" Identifier [ "=" Expression ] ";" ;
+DefineStatement= "DEFINE" Identifier [ "=" Expression ] ";" ;
+SldeployStatement = "SLDEPLOY" Expression ";" ;
+StartStatement = "START" Expression "{" { RaceClause } "}" ;
+RaceClause     = "RACE" Expression BlockStatement ;
+DoTrackStatement = "DO" BlockStatement [ "TRACK" BlockStatement ] ;
+FuncDeclaration  = "FUNC" Identifier [ "(" [ ParamList ] ")" ] BlockStatement ;
+AsyncFuncDeclaration = "ASYNC" "FUNC" Identifier [ "(" [ ParamList ] ")" ] BlockStatement ;
+ParamList       = Identifier { "," Identifier } ;
+IfStatement     = "IF" [ "(" Expression ")" ] BlockStatement [ "ELSE" (IfStatement | BlockStatement) ] ;
+WhileStatement  = "WHILE" [ "(" Expression ")" ] BlockStatement ;
+ForStatement    = "FOR" ( ForInStatement | ForClassicStatement ) ;
+ForInStatement  = [ "LET" ] Identifier "IN" Expression BlockStatement ;
+ForClassicStatement = "(" [ VarDeclaration | ExpressionStatement ] ";" [ Expression ] ";" [ Expression ] ")" BlockStatement ;
+BreakStatement  = "BREAK" ";" ;
+ContinueStatement = "CONTINUE" ";" ;
+ReturnStatement = "RETURN" [ Expression ] ";" ;
+ImportStatement = "IMPORT" ImportSpec "FROM" StringLiteral ";" ;
+ImportSpec      = "*" "AS" Identifier
+                | "{" { Identifier [ "AS" Identifier ] [ "," ] } "}"
+                | Identifier ;
+BlockStatement  = "{" { Statement } "}" ;
+ExpressionStatement = Expression ";" ;
+
+Expression      = Assignment ;
+Assignment      = Ternary { ("=" | "+=" | "-=" | "*=" | "/=" | "%=") Assignment } ;
+Ternary         = NullishCoalescing [ "?" Expression ":" Expression ] ;
+NullishCoalescing = LogicalOr { "??" LogicalOr } ;
+LogicalOr       = LogicalAnd { "OR" LogicalAnd } ;
+LogicalAnd      = Equality { "AND" Equality } ;
+Equality        = Comparison { ("==" | "!=") Comparison } ;
+Comparison      = Term { ("<" | "<=" | ">" | ">=") Term } ;
+Term            = Factor { ("+" | "-") Factor } ;
+Factor          = Unary { ("*" | "/" | "%") Unary } ;
+Unary           = ( "!" | "-" | "+" | "++" | "--" ) Unary | Postfix ;
+Postfix         = Primary { ("[" Expression "]" | "(" [ ArgList ] ")" | "." Identifier | "++" | "--") } ;
+ArgList         = Expression { "," Expression } ;
+Primary         = NumberLiteral
+                | StringLiteral
+                | BooleanLiteral
+                | NullLiteral
+                | Identifier
+                | "AWAIT" Expression
+                | "NEW" Primary "(" [ ArgList ] ")"
+                | "ASK" "(" [ ArgList ] ")"
+                | "(" Expression { "," Expression } ")"
+                | "[" [ Expression { "," Expression } ] "]"
+                | "{" [ ObjectProperty { "," ObjectProperty } ] "}" ;
+ObjectProperty  = Expression ":" Expression ;
+
+Identifier      = ? identifier token ? ;
+NumberLiteral   = ? number token ? ;
+StringLiteral   = ? string token ? ;
+BooleanLiteral  = "TRUE" | "FALSE" ;
+NullLiteral     = "NULL" ;
