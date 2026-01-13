@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Starlight Editor</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+:root {
+  --bg: #1e1e1e;
+  --sidebar: #252526;
+  --editor: #1e1e1e;
+  --text: #d4d4d4;
+  --border: #333;
+  --tab: #2d2d2d;
+  --active-tab: #1e1e1e;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  font-family: Consolas, "Fira Code", "JetBrains Mono", monospace;
+  background: var(--bg);
+  color: var(--text);
+}
+
+#sidebar {
+  width: 280px;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  padding: 8px;
+  overflow: auto;
+}
+
+#main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#toolbar {
+  padding: 6px;
+  border-bottom: 1px solid var(--border);
+  background: #2a2a2a;
+}
+
+button {
+  background: #3a3a3a;
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #444;
+}
+
+#tabs {
+  display: flex;
+  height: 36px;
+  background: var(--tab);
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border-right: 1px solid var(--border);
+}
+
+.tab.active {
+  background: var(--active-tab);
+}
+
+.tab i {
+  margin-left: 8px;
+  color: #aaa;
+}
+
+#editor {
+  flex: 1;
+  padding: 12px;
+  outline: none;
+  white-space: pre;
+  overflow: auto;
+  font-size: 14px;
+  line-height: 1.5;
+  caret-color: white;
+}
+
+.tree-item {
+  padding: 2px 0;
+  cursor: pointer;
+}
+
+.tree-item i {
+  width: 16px;
+}
+
+.folder > .children {
+  margin-left: 16px;
+  display: none;
+}
+
+.folder.open > .children {
+  display: block;
+}
+
+/* Syntax */
+.keyword { color: #569cd6; }
+.string { color: #ce9178; }
+.number { color: #b5cea8; }
+.comment { color: #6a9955; }
+</style>
+</head>
+
+<body>
+
+<div id="sidebar">
+  <button onclick="pickFolder()"><i class="fa fa-folder-open"></i> Open Folder</button>
+  <div id="tree"></div>
+</div>
+
+<div id="main">
+  <div id="toolbar">
+    <button onclick="saveFile()"><i class="fa fa-save"></i> Save</button>
+    <button onclick="newFile()"><i class="fa fa-file-circle-plus"></i> New File</button>
+  </div>
+  <div id="tabs"></div>
+  <div id="editor" contenteditable="true"></div>
+</div>
+
+<script>
+let rootHandle;
+let openFiles = new Map();
+let activeFile = null;
+
+const keywords = [
+  'let','if','else','while','for','func','return',
+  'true','false','null','break','continue',
+  'import','from','as','async','await',
+  'sldeploy'
+];
+
+async function pickFolder() {
+  rootHandle = await window.showDirectoryPicker();
+  document.getElementById('tree').innerHTML = '';
+  await loadDirectory(rootHandle, document.getElementById('tree'));
+}
+
+async function loadDirectory(dirHandle, container) {
+  for await (const [name, handle] of dirHandle.entries()) {
+    const item = document.createElement('div');
+    item.className = 'tree-item';
+
+    if (handle.kind === 'directory') {
+      item.classList.add('folder');
+      item.innerHTML = `<i class="fa fa-chevron-right"></i> <i class="fa fa-folder"></i> ${name}`;
+      const children = document.createElement('div');
+      children.className = 'children';
+
+      item.onclick = async (e) => {
+        e.stopPropagation();
+        item.classList.toggle('open');
+        item.querySelector('.fa-chevron-right').classList.toggle('fa-rotate-90');
+        if (!children.loaded) {
+          await loadDirectory(handle, children);
+          children.loaded = true;
+        }
+      };
+      item.appendChild(children);
+    } else {
+      item.innerHTML = `<i class="fa fa-file"></i> ${name}`;
+      item.onclick = () => openFile(handle, name);
+    }
+    container.appendChild(item);
+  }
+}
+
+async function openFile(handle, name) {
+  if (openFiles.has(handle)) return activateTab(handle);
+  const file = await handle.getFile();
+  const text = await file.text();
+  openFiles.set(handle, { name, handle, content: text });
+  createTab(handle);
+  activateTab(handle);
+}
+
+function createTab(handle) {
+  const tab = document.createElement('div');
+  tab.className = 'tab';
+  tab.textContent = openFiles.get(handle).name;
+  const close = document.createElement('i');
+  close.className = 'fa fa-xmark';
+  close.onclick = e => { e.stopPropagation(); closeTab(handle); };
+  tab.appendChild(close);
+  tab.onclick = () => activateTab(handle);
+  document.getElementById('tabs').appendChild(tab);
+}
+
+function activateTab(handle) {
+  activeFile = handle;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  [...document.querySelectorAll('.tab')]
+    .find(t => t.textContent.includes(openFiles.get(handle).name))
+    ?.classList.add('active');
+  renderEditor(openFiles.get(handle).content);
+}
+
+function closeTab(handle) {
+  openFiles.delete(handle);
+  document.getElementById('tabs').innerHTML = '';
+  for (const h of openFiles.keys()) createTab(h);
+  if (openFiles.size) activateTab(openFiles.keys().next().value);
+  else editor.innerHTML = '';
+}
+
+function renderEditor(text) {
+  editor.innerHTML = highlight(text);
+}
+
+function highlight(code) {
+  return code
+    .replace(/(#.*)/g, '<span class="comment">$1</span>')
+    .replace(/"(.*?)"/g, '<span class="string">"$1"</span>')
+    .replace(/\b\d+\b/g, '<span class="number">$&</span>')
+    .replace(new RegExp(`\\b(${keywords.join('|')})\\b`, 'g'),
+      '<span class="keyword">$1</span>');
+}
+
+editor.addEventListener('keydown', e => {
+  const pairs = { '(': ')', '{': '}', '[': ']', '"': '"', "'": "'" };
+  if (pairs[e.key]) {
+    e.preventDefault();
+    document.execCommand('insertText', false, e.key + pairs[e.key]);
+    document.getSelection().modify('move', 'backward', 'character');
+  }
+});
+
+async function saveFile() {
+  if (!activeFile) return;
+  const writable = await activeFile.createWritable();
+  const text = editor.innerText;
+  await writable.write(text);
+  await writable.close();
+  openFiles.get(activeFile).content = text;
+}
+
+async function newFile() {
+  if (!rootHandle) return;
+  const name = prompt('File name');
+  if (!name) return;
+  const handle = await rootHandle.getFileHandle(name, { create: true });
+  openFile(handle, name);
+}
+
+const editor = document.getElementById('editor');
+</script>
+
+</body>
+</html>
