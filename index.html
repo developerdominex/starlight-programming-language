@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>🌟 Starlight Documentation</title>
+  <title>Starlight Documentation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
   <!-- Markdown parser -->
@@ -59,7 +59,22 @@ hr { border: none; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
 </main>
 
 <script>
-  // All Markdown files (raw URLs on GitHub)
+  const RAW_BASE =
+    "https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/";
+
+  function fixImagePaths(md, fileUrl) {
+    const basePath = fileUrl.substring(0, fileUrl.lastIndexOf("/") + 1);
+
+    return md.replace(
+      /!\[([^\]]*)\]\((?!https?:\/\/)([^)]+)\)/g,
+      (_, alt, src) => {
+        const fixed = src.startsWith("/")
+          ? RAW_BASE + src.slice(1)
+          : basePath + src;
+        return `![${alt}](${fixed})`;
+      }
+    );
+  }
   const mdFiles = [
     // Docs
     
@@ -104,9 +119,12 @@ hr { border: none; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
       try {
         const res = await fetch(file);
         if (!res.ok) throw new Error();
-        const md = await res.text();
+        let md = await res.text();
+md = fixImagePaths(md, file);
+        
         const section = document.createElement('section');
-        section.innerHTML = marked.parse(md);
+section.innerHTML = marked.parse(md);
+
         contentEl.appendChild(section);
         contentEl.appendChild(document.createElement('hr'));
       } catch (e) {
