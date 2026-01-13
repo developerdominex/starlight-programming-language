@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Starlight – Extract Markdown</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 2rem;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+    textarea {
+      width: 100%;
+      height: 70vh;
+      padding: 1rem;
+      font-family: ui-monospace, monospace;
+      font-size: 14px;
+      background: #020617;
+      color: #e5e7eb;
+      border: 1px solid #334155;
+      border-radius: 8px;
+    }
+    button {
+      padding: 10px 16px;
+      font-size: 14px;
+      margin-bottom: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🧪 Starlight Markdown Extractor</h1>
+<p>Click “Generate”, then copy everything from the box.</p>
+
+<button onclick="generate()">Generate</button>
+
+<textarea id="output" placeholder="Generated HTML will appear here…"></textarea>
+
+<script>
+const RAW_BASE =
+  "https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/";
+
+const mdFiles = [
+  "developer/maintainer/biography.md",
+  "docs/introduction.md",
+  "docs/getting-started.md",
+  "docs/installation.md",
+  "docs/syntax-overview.md",
+  "docs/variables.md",
+  "docs/data-types.md",
+  "docs/control-flow.md",
+  "docs/functions.md",
+  "docs/arrays.md",
+  "docs/objects.md",
+  "docs/modules.md",
+  "docs/async-await.md",
+  "docs/cli.md",
+  "packages/starlight-math.md",
+  "packages/starlight-fs.md",
+  "packages/starlight-time.md",
+  "packages/starlight-color.md",
+  "packages/starlight-txt-to-pdf.md",
+  "packages/wiki-starlight-api.md",
+  "spec/language-spec.md",
+  "spec/keywords.md",
+  "spec/operators.md",
+  "spec/runtime-model.md",
+  "spec/builtins.md"
+];
+
+function fixImages(md, base) {
+  return md.replace(
+    /!\[([^\]]*)\]\((?!https?:\/\/)([^)]+)\)/g,
+    (_, alt, src) =>
+      `![${alt}](${base}${src.replace(/^\.?\//, "")})`
+  );
+}
+
+async function generate() {
+  let html = "";
+  for (const file of mdFiles) {
+    const url = RAW_BASE + file;
+    const res = await fetch(url);
+    const md = fixImages(await res.text(), RAW_BASE + file.substring(0, file.lastIndexOf("/") + 1));
+    html += `<section>\n${marked.parse(md)}\n</section>\n<hr/>\n`;
+  }
+  document.getElementById("output").value = html;
+}
+</script>
+
+</body>
+</html>
