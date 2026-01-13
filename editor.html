@@ -3,68 +3,94 @@
 <head>
 <meta charset="UTF-8">
 <title>Starlight Editor</title>
+<!-- FontAwesome CSS only, no kit needed -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-p1zC4q8q+bLLi6OvPO+Zsmh7k0HXJhFwF3Fz+q0+8sZBG3FpTzGnDnYEKX7xHC4nFq7UVJZAhU2OjQ3LFqU2FQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 <style>
-  body { margin: 0; font-family: monospace; display: flex; height: 100vh; }
-  #sidebar { width: 250px; background: #1e1e1e; color: #ccc; overflow-y: auto; padding: 10px; }
+  body { margin: 0; font-family: monospace; display: flex; height: 100vh; background: #1e1e1e; color: #ccc; }
+  #sidebar { width: 300px; background: #2d2d2d; overflow-y: auto; padding: 10px; box-sizing: border-box; }
+  #sidebar button { width: 100%; margin-bottom: 5px; background: #444; color: #fff; border: none; padding: 5px; cursor: pointer; }
   #editor-container { flex: 1; display: flex; flex-direction: column; }
-  #tabs { height: 35px; display: flex; background: #2d2d2d; }
-  .tab { padding: 5px 10px; cursor: pointer; border-right: 1px solid #444; display: flex; align-items: center; }
-  .tab.active { background: #1e1e1e; }
+  #tabs { height: 35px; display: flex; background: #3c3c3c; overflow-x: auto; }
+  .tab { padding: 5px 10px; cursor: pointer; border-right: 1px solid #555; display: flex; align-items: center; }
+  .tab.active { background: #1e1e1e; color: #fff; }
   .tab button { margin-left: 5px; background: none; border: none; color: #aaa; cursor: pointer; }
-  #editor { flex: 1; background: #1e1e1e; color: #ccc; padding: 10px; overflow: auto; white-space: pre; outline: none; font-family: monospace; }
+  #editor { flex: 1; background: #1e1e1e; color: #ccc; padding: 10px; overflow: auto; white-space: pre; outline: none; font-family: monospace; line-height: 1.4em; }
   .keyword { color: #569CD6; font-weight: bold; }
   .string { color: #CE9178; }
   .number { color: #B5CEA8; }
   .comment { color: #6A9955; font-style: italic; }
+  .folder, .file { display: flex; align-items: center; cursor: pointer; padding: 2px 5px; user-select: none; }
+  .folder:hover, .file:hover { background: #3a3a3a; }
+  .folder > i, .file > i { margin-right: 5px; width: 16px; text-align: center; }
+  .children { padding-left: 20px; display: none; }
+  .folder.open > .children { display: block; }
 </style>
 </head>
 <body>
 <div id="sidebar">
-  <button id="openFolder">Open Folder</button>
-  <div id="fileList"></div>
+  <button id="selectFolderBtn">Select Folder</button>
+  <button id="changeFolderBtn">Change Folder</button>
+  <div id="fileTree"></div>
 </div>
 
 <div id="editor-container">
   <div id="tabs"></div>
-  <div id="editor" contenteditable="true"></div>
+  <div id="editor" contenteditable="true" spellcheck="false"></div>
   <button id="saveBtn">Save</button>
 </div>
 
 <script>
 const starlightKeywords=["let","sldeploy","if","else","while","for","break","continue","func","return","true","false","null","ask","define","import","from","as","async","await","new","in","do","track","start","race"];
-
-let files = {}; // {filename: {handle, content}}
+let activeFolderHandle = null;
+let files = {}; 
 let activeFile = null;
 
 const editor = document.getElementById('editor');
 const tabs = document.getElementById('tabs');
-const fileList = document.getElementById('fileList');
+const fileTree = document.getElementById('fileTree');
+
+async function requestFolder(saved=false) {
+  try {
+    activeFolderHandle = await window.showDirectoryPicker();
+    await buildFileTree();
+  } catch(e) {
+    console.error("Folder access cancelled", e);
+  }
+}
 
 function highlight(code) {
-  // escape HTML
   code = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  // highlight comments
   code = code.replace(/(\/\/.*)/g, '<span class="comment">$1</span>');
-  // highlight strings
   code = code.replace(/(["'`].*?["'`])/g, '<span class="string">$1</span>');
-  // highlight numbers
   code = code.replace(/\b(\d+(\.\d+)?)\b/g, '<span class="number">$1</span>');
-  // highlight keywords
   const kw = starlightKeywords.join("|");
   code = code.replace(new RegExp(`\\b(${kw})\\b`, "g"), '<span class="keyword">$1</span>');
   return code;
 }
 
-function openFile(handle, name) {
+function preserveCursor(fn) {
+  const sel = window.getSelection();
+  const range = sel.rangeCount ? sel.getRangeAt(0) : null;
+  const offset = range ? range.startOffset : 0;
+  fn();
+  if(range){
+    sel.removeAllRanges();
+    const newRange = document.createRange();
+    newRange.setStart(editor.firstChild || editor, offset);
+    newRange.collapse(true);
+    sel.addRange(newRange);
+  }
+}
+
+async function openFile(handle, name) {
   files[name] = {handle, content: ''};
   activeFile = name;
-
-  // read content
-  handle.getFile().then(file => file.text()).then(text => {
-    files[name].content = text;
-    editor.innerHTML = highlight(text);
-    renderTabs();
-  });
+  const file = await handle.getFile();
+  const text = await file.text();
+  files[name].content = text;
+  preserveCursor(() => { editor.innerHTML = highlight(text); });
+  renderTabs();
 }
 
 function renderTabs() {
@@ -73,43 +99,50 @@ function renderTabs() {
     const tab = document.createElement('div');
     tab.className = 'tab' + (name === activeFile ? ' active' : '');
     tab.innerHTML = name + '<button>&times;</button>';
-    tab.onclick = () => { activeFile = name; editor.innerHTML = highlight(files[name].content); renderTabs(); };
-    tab.querySelector('button').onclick = (e) => { e.stopPropagation(); delete files[name]; if(activeFile===name) activeFile=Object.keys(files)[0]||null; if(activeFile) editor.innerHTML = highlight(files[activeFile].content); renderTabs(); };
+    tab.onclick = () => { activeFile=name; preserveCursor(()=>editor.innerHTML=highlight(files[name].content)); renderTabs(); };
+    tab.querySelector('button').onclick = e => { e.stopPropagation(); delete files[name]; if(activeFile===name) activeFile=Object.keys(files)[0]||null; if(activeFile) preserveCursor(()=>editor.innerHTML=highlight(files[activeFile].content)); renderTabs(); };
     tabs.appendChild(tab);
   });
 }
 
 editor.addEventListener('input', () => {
-  if(activeFile) {
-    const text = editor.innerText;
-    files[activeFile].content = text;
-    editor.innerHTML = highlight(text);
-    // move cursor to end
-    const range = document.createRange();
-    const sel = window.getSelection();
-    range.selectNodeContents(editor);
-    range.collapse(false);
-    sel.removeAllRanges();
-    sel.addRange(range);
-  }
+  if(!activeFile) return;
+  const text = editor.innerText;
+  files[activeFile].content = text;
+  preserveCursor(() => { editor.innerHTML = highlight(text); });
 });
 
-document.getElementById('openFolder').onclick = async () => {
-  const dirHandle = await window.showDirectoryPicker();
-  fileList.innerHTML = '';
-  for await (const [name, handle] of dirHandle.entries()) {
-    const fileDiv = document.createElement('div');
-    fileDiv.textContent = name;
-    fileDiv.style.cursor = 'pointer';
-    fileDiv.onclick = () => openFile(handle, name);
-    fileList.appendChild(fileDiv);
+async function buildFileTree() {
+  fileTree.innerHTML = '';
+  async function traverse(handle, container) {
+    for await (const [name, child] of handle.entries()) {
+      const div = document.createElement('div');
+      if(child.kind==='directory') {
+        div.className = 'folder';
+        div.innerHTML = `<i class="fa fa-caret-right"></i><i class="fa fa-folder"></i> ${name}`;
+        const childrenContainer = document.createElement('div');
+        childrenContainer.className='children';
+        div.appendChild(childrenContainer);
+        div.onclick = e => { e.stopPropagation(); div.classList.toggle('open'); div.querySelector('.fa-caret-right, .fa-caret-down').classList.toggle('fa-caret-down'); div.querySelector('.fa-caret-right, .fa-caret-down').classList.toggle('fa-caret-right'); };
+        container.appendChild(div);
+        await traverse(child, childrenContainer);
+      } else {
+        div.className = 'file';
+        div.innerHTML = `<i class="fa fa-file"></i> ${name}`;
+        div.onclick = () => openFile(child, name);
+        container.appendChild(div);
+      }
+    }
   }
-};
+  await traverse(activeFolderHandle, fileTree);
+}
+
+document.getElementById('selectFolderBtn').onclick = () => requestFolder();
+document.getElementById('changeFolderBtn').onclick = () => requestFolder();
 
 document.getElementById('saveBtn').onclick = async () => {
-  if(!activeFile) return alert('No file open');
-  const fileHandle = files[activeFile].handle;
-  const writable = await fileHandle.createWritable();
+  if(!activeFile) return alert('No file selected');
+  const writable = await files[activeFile].handle.createWritable();
   await writable.write(files[activeFile].content);
   await writable.close();
   alert('Saved!');
