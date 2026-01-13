@@ -2,166 +2,174 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Starlight Editor</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-p1zC4q8q+bLLi6OvPO+Zsmh7k0HXJhFwF3Fz+q0+8sZBG3FpTzGnDnYEKX7xHC4nFq7UVJZAhU2OjQ3LFqU2FQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<!-- CodeMirror 6 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@6.0.1/dist/codemirror.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@codemirror/basic-setup@6.0.1/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@codemirror/view@6.0.1/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@codemirror/state@6.0.1/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@codemirror/lang-javascript@6.0.1/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@codemirror/highlight@6.0.1/dist/index.js"></script>
+
+<!-- FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
 <style>
-  body { margin: 0; font-family: monospace; display: flex; height: 100vh; background: #1e1e1e; color: #ccc; }
-  #sidebar { width: 300px; background: #252526; overflow-y: auto; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; }
-  #sidebar button { width: 100%; margin-bottom: 5px; background: #0e639c; color: #fff; border: none; padding: 5px; cursor: pointer; border-radius: 3px; }
-  #fileTree { flex: 1; margin-top: 5px; overflow-y: auto; }
-  .folder, .file { display: flex; align-items: center; cursor: pointer; padding: 2px 5px; border-radius: 3px; user-select: none; }
-  .folder:hover, .file:hover { background: #373737; }
-  .folder > i.toggle { margin-right: 5px; width: 16px; text-align: center; transition: transform 0.2s ease; }
-  .folder.open > i.toggle { transform: rotate(90deg); }
-  .folder > i.icon, .file > i.icon { margin-right: 5px; width: 16px; text-align: center; }
-  .children { padding-left: 20px; display: none; }
-  .folder.open > .children { display: block; }
+  body { margin: 0; font-family: 'Fira Code', monospace; display: flex; height: 100vh; }
+  #sidebar { width: 300px; background: #1e1e1e; color: #ccc; overflow-y: auto; padding: 10px; }
   #editor-container { flex: 1; display: flex; flex-direction: column; }
-  #tabs { height: 35px; display: flex; background: #333; overflow-x: auto; }
-  .tab { padding: 5px 10px; cursor: pointer; border-right: 1px solid #555; display: flex; align-items: center; border-top-left-radius: 4px; border-top-right-radius: 4px; }
-  .tab.active { background: #1e1e1e; color: #fff; }
-  .tab button { margin-left: 5px; background: none; border: none; color: #aaa; cursor: pointer; }
-  #editor { flex: 1; background: #1e1e1e; color: #ccc; padding: 10px; overflow: auto; white-space: pre; outline: none; font-family: monospace; line-height: 1.4em; caret-color: #fff; }
-  .keyword { color: #569CD6; font-weight: bold; }
-  .string { color: #CE9178; }
-  .number { color: #B5CEA8; }
-  .comment { color: #6A9955; font-style: italic; }
+  #tabs { height: 40px; background: #2d2d2d; display: flex; align-items: center; overflow-x: auto; }
+  .tab { padding: 5px 10px; margin-right: 2px; background: #3c3c3c; display: flex; align-items: center; cursor: pointer; }
+  .tab.active { background: #007acc; color: white; }
+  .tab i { margin-left: 5px; cursor: pointer; }
+  #editor { flex: 1; }
+  ul { list-style: none; padding-left: 0; }
+  li { display: flex; align-items: center; cursor: pointer; padding: 2px 5px; }
+  li i.folder { margin-right: 5px; }
+  li i.file { margin-right: 5px; }
+  li.collapsible > span { user-select: none; flex: 1; }
+  li.collapsible > ul { display: none; margin-left: 15px; }
+  li.collapsible.open > ul { display: block; }
+  button { cursor: pointer; }
 </style>
 </head>
 <body>
 
 <div id="sidebar">
-  <button id="selectFolderBtn">Select Folder</button>
-  <button id="changeFolderBtn">Change Folder</button>
-  <div id="fileTree"></div>
+  <button id="select-folder">Select Folder</button>
+  <ul id="file-tree"></ul>
 </div>
 
 <div id="editor-container">
   <div id="tabs"></div>
-  <div id="editor" contenteditable="true" spellcheck="false"></div>
-  <button id="saveBtn" style="background:#0e639c;color:#fff;border:none;padding:5px;cursor:pointer;margin-top:2px;border-radius:3px;">Save</button>
+  <div id="editor"></div>
+  <button id="save-btn" style="background:#007acc;color:white;border:none;height:40px;">Save</button>
 </div>
 
-<script>
-const starlightKeywords=["let","sldeploy","if","else","while","for","break","continue","func","return","true","false","null","ask","define","import","from","as","async","await","new","in","do","track","start","race"];
-let activeFolderHandle = null;
-let files = {}; 
+<script type="module">
+import {EditorView, basicSetup} from "https://cdn.jsdelivr.net/npm/@codemirror/basic-setup@6.0.1/dist/index.js";
+import {EditorState} from "https://cdn.jsdelivr.net/npm/@codemirror/state@6.0.1/dist/index.js";
+import {javascript} from "https://cdn.jsdelivr.net/npm/@codemirror/lang-javascript@6.0.1/dist/index.js";
+import {HighlightStyle, tags} from "https://cdn.jsdelivr.net/npm/@codemirror/highlight@6.0.1/dist/index.js";
+
+let folderHandle = null;
+let openFiles = {};
 let activeFile = null;
 
-const editor = document.getElementById('editor');
-const tabs = document.getElementById('tabs');
-const fileTree = document.getElementById('fileTree');
+// Starlight syntax highlighting
+const starlightHighlight = HighlightStyle.define([
+  { tag: tags.keyword, color: '#dcdcaa' },
+  { tag: tags.variableName, color: '#9cdcfe' },
+  { tag: tags.comment, color: '#6a9955' },
+  { tag: tags.string, color: '#ce9178' },
+  { tag: tags.number, color: '#b5cea8' },
+]);
 
-async function requestFolder() {
-  try {
-    activeFolderHandle = await window.showDirectoryPicker();
-    await buildFileTree();
-  } catch(e) { console.error("Folder access cancelled", e); }
-}
+const starlightLanguage = javascript({ keywords: ['var', 'let', 'const', 'if', 'else', 'while', 'for', 'break', 'continue', 'function', 'return', 'sldeploy'] });
 
-function highlight(code) {
-  code = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  code = code.replace(/(\/\/.*)/g, '<span class="comment">$1</span>');
-  code = code.replace(/(["'`].*?["'`])/g, '<span class="string">$1</span>');
-  code = code.replace(/\b(\d+(\.\d+)?)\b/g, '<span class="number">$1</span>');
-  const kw = starlightKeywords.join("|");
-  code = code.replace(new RegExp(`\\b(${kw})\\b`, "g"), '<span class="keyword">$1</span>');
-  return code;
-}
-
-function preserveCursor(fn) {
-  const sel = window.getSelection();
-  if(!sel.rangeCount) { fn(); return; }
-  const range = sel.getRangeAt(0);
-  const startContainer = range.startContainer;
-  const startOffset = range.startOffset;
-  fn();
-  sel.removeAllRanges();
-  const newRange = document.createRange();
-  if(editor.firstChild){
-    newRange.setStart(editor.firstChild, Math.min(startOffset, editor.firstChild.length));
-  } else {
-    newRange.setStart(editor, 0);
-  }
-  newRange.collapse(true);
-  sel.addRange(newRange);
-}
-
-async function openFile(handle, name) {
-  files[name] = {handle, content: ''};
-  activeFile = name;
-  const file = await handle.getFile();
-  const text = await file.text();
-  files[name].content = text;
-  preserveCursor(()=>{ editor.innerHTML = highlight(text); });
-  renderTabs();
-}
-
-function renderTabs() {
-  tabs.innerHTML = '';
-  Object.keys(files).forEach(name=>{
-    const tab = document.createElement('div');
-    tab.className = 'tab' + (name===activeFile?' active':'');
-    tab.innerHTML = `<span>${name}</span><button>&times;</button>`;
-    tab.onclick = ()=>{ activeFile=name; preserveCursor(()=>editor.innerHTML=highlight(files[name].content)); renderTabs(); };
-    tab.querySelector('button').onclick = e=>{ e.stopPropagation(); delete files[name]; if(activeFile===name) activeFile=Object.keys(files)[0]||null; if(activeFile) preserveCursor(()=>editor.innerHTML=highlight(files[activeFile].content)); renderTabs(); };
-    tabs.appendChild(tab);
-  });
-}
-
-editor.addEventListener('input', ()=>{
-  if(!activeFile) return;
-  const sel = window.getSelection();
-  const range = sel.getRangeAt(0);
-  const offset = range.startOffset;
-  files[activeFile].content = editor.innerText;
-  preserveCursor(()=>{ editor.innerHTML = highlight(editor.innerText); });
-  // restore cursor
-  const newRange = document.createRange();
-  newRange.setStart(editor.firstChild||editor, Math.min(offset, editor.firstChild?.length||0));
-  newRange.collapse(true);
-  sel.removeAllRanges();
-  sel.addRange(newRange);
+const editor = new EditorView({
+  state: EditorState.create({
+    doc: '',
+    extensions: [basicSetup, starlightLanguage, starlightHighlight]
+  }),
+  parent: document.getElementById('editor')
 });
 
-async function buildFileTree() {
-  fileTree.innerHTML='';
-  async function traverse(handle, container){
-    for await (const [name, child] of handle.entries()){
-      const div = document.createElement('div');
-      if(child.kind==='directory'){
-        div.className='folder';
-        div.innerHTML=`<i class="fa fa-caret-right toggle"></i><i class="fa fa-folder icon"></i>${name}`;
-        const childrenContainer=document.createElement('div');
-        childrenContainer.className='children';
-        div.appendChild(childrenContainer);
-        div.querySelector('.toggle').onclick=e=>{
-          e.stopPropagation();
-          div.classList.toggle('open');
-        };
-        container.appendChild(div);
-        await traverse(child, childrenContainer);
-      } else {
-        div.className='file';
-        div.innerHTML=`<i class="fa fa-file icon"></i>${name}`;
-        div.onclick=()=>openFile(child,name);
-        container.appendChild(div);
-      }
+document.getElementById('select-folder').addEventListener('click', async () => {
+  folderHandle = await window.showDirectoryPicker();
+  loadFolder(folderHandle, document.getElementById('file-tree'));
+});
+
+// Recursively list files/folders
+async function loadFolder(dirHandle, parentUl) {
+  parentUl.innerHTML = '';
+  for await (const [name, handle] of dirHandle.entries()) {
+    const li = document.createElement('li');
+    const icon = document.createElement('i');
+    const span = document.createElement('span');
+    span.textContent = name;
+
+    if (handle.kind === 'directory') {
+      icon.className = 'fas fa-folder folder';
+      li.classList.add('collapsible');
+      const ul = document.createElement('ul');
+      li.appendChild(icon);
+      li.appendChild(span);
+      li.appendChild(ul);
+      span.addEventListener('click', () => li.classList.toggle('open'));
+      parentUl.appendChild(li);
+      loadFolder(handle, ul);
+    } else {
+      icon.className = 'fas fa-file file';
+      li.appendChild(icon);
+      li.appendChild(span);
+      span.addEventListener('click', async () => openFile(handle));
+      parentUl.appendChild(li);
     }
   }
-  await traverse(activeFolderHandle,fileTree);
 }
 
-document.getElementById('selectFolderBtn').onclick=requestFolder;
-document.getElementById('changeFolderBtn').onclick=requestFolder;
+async function openFile(fileHandle) {
+  const file = await fileHandle.getFile();
+  const text = await file.text();
+  if (openFiles[fileHandle.name]) {
+    setActiveTab(fileHandle.name);
+    return;
+  }
+  // Create tab
+  const tab = document.createElement('div');
+  tab.className = 'tab active';
+  tab.textContent = fileHandle.name;
+  const closeBtn = document.createElement('i');
+  closeBtn.className = 'fas fa-times';
+  closeBtn.onclick = () => closeTab(fileHandle.name);
+  tab.appendChild(closeBtn);
+  document.getElementById('tabs').appendChild(tab);
 
-document.getElementById('saveBtn').onclick=async ()=>{
-  if(!activeFile) return alert('No file selected');
-  const writable = await files[activeFile].handle.createWritable();
-  await writable.write(files[activeFile].content);
+  openFiles[fileHandle.name] = { handle: fileHandle, tab, content: text };
+  setActiveTab(fileHandle.name);
+}
+
+function setActiveTab(name) {
+  activeFile = name;
+  // Set editor content
+  editor.dispatch({ changes: { from: 0, to: editor.state.doc.length, insert: openFiles[name].content } });
+  // Highlight active tab
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  openFiles[name].tab.classList.add('active');
+}
+
+function closeTab(name) {
+  openFiles[name].tab.remove();
+  delete openFiles[name];
+  if (activeFile === name) {
+    const keys = Object.keys(openFiles);
+    if (keys.length) setActiveTab(keys[0]);
+    else {
+      editor.dispatch({ changes: { from: 0, to: editor.state.doc.length, insert: '' } });
+      activeFile = null;
+    }
+  }
+}
+
+document.getElementById('save-btn').addEventListener('click', async () => {
+  if (!activeFile) return;
+  const file = openFiles[activeFile];
+  const writable = await file.handle.createWritable();
+  await writable.write(editor.state.doc.toString());
   await writable.close();
-  alert('Saved!');
-};
+  file.content = editor.state.doc.toString();
+});
+
+// Create new file
+async function createFile(name) {
+  if (!folderHandle) return alert('Select a folder first');
+  const handle = await folderHandle.getFileHandle(name, { create: true });
+  await openFile(handle);
+}
+
 </script>
 </body>
 </html>
