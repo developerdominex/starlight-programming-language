@@ -182,24 +182,71 @@ body {
 </div>
 
 <script>
+/* ===================== CONFIG ===================== */
 const RAW_BASE =
-  "https://raw.githubusercontent.com/developerdominex/starlight-programming-language/main/";
+  "https://raw.githubusercontent.com/dominexmacedon/starlight-programming-language/main/";
 
+/* ===================== ELEMENTS ===================== */
 const content = document.getElementById("content");
 const items = document.querySelectorAll(".item");
 
+/* ===================== HELPERS ===================== */
+function fixRelativePaths(container, basePath) {
+  // Fix images
+  container.querySelectorAll("img").forEach(img => {
+    const src = img.getAttribute("src");
+    if (!src) return;
+
+    if (
+      !src.startsWith("http://") &&
+      !src.startsWith("https://") &&
+      !src.startsWith("data:")
+    ) {
+      img.src =
+        RAW_BASE +
+        (basePath ? basePath + "/" : "") +
+        src.replace(/^\.?\//, "");
+    }
+  });
+
+  // Fix markdown links to other .md files
+  container.querySelectorAll("a").forEach(a => {
+    const href = a.getAttribute("href");
+    if (!href) return;
+
+    if (href.endsWith(".md")) {
+      a.addEventListener("click", e => {
+        e.preventDefault();
+        loadMarkdown(href);
+      });
+    }
+  });
+}
+
+/* ===================== LOADER ===================== */
 async function loadMarkdown(path) {
   content.innerHTML = "<p>Loading...</p>";
+
   try {
     const res = await fetch(RAW_BASE + path);
     if (!res.ok) throw new Error("Failed to load");
+
     const md = await res.text();
+
+    // Render markdown
     content.innerHTML = marked.parse(md);
-  } catch {
-    content.innerHTML = "<h2>Error</h2><p>Unable to load documentation.</p>";
+
+    // Resolve relative assets
+    const basePath = path.split("/").slice(0, -1).join("/");
+    fixRelativePaths(content, basePath);
+
+  } catch (err) {
+    content.innerHTML =
+      "<h2>Error</h2><p>Unable to load documentation.</p>";
   }
 }
 
+/* ===================== SIDEBAR EVENTS ===================== */
 items.forEach(item => {
   item.addEventListener("click", () => {
     items.forEach(i => i.classList.remove("active"));
