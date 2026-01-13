@@ -1,12 +1,12 @@
 ![Starlight-logo](logo/starlight-lang-logo.png)
-# 🌟 Starlight Programming Language
+#  Starlight Programming Language
 
 **Starlight** is a lightweight, modern scripting language designed for **server-side scripting**, **CLI tools**, and **automation**.  
 It focuses on simplicity, readable syntax, and practical features for everyday programming. starlight-cli was officially released on December 14 2025.
 
 ---
 
-## ✨ Features
+##  Features
 
 - Simple and expressive syntax
 - Built-in CLI support
@@ -20,7 +20,7 @@ It focuses on simplicity, readable syntax, and practical features for everyday p
 
 ---
 
-## 📦 Installation
+##  Installation
 
 Install the Starlight CLI via npm:
 
@@ -36,7 +36,7 @@ starlight --version
 
 ---
 
-## 🚀 Running a Program
+##  Running a Program
 
 Create a file:
 
@@ -52,7 +52,7 @@ starlight program.sl
 
 ---
 
-## 🧪 Example
+##  Example
 
 ```sl
 let nums = range(0, 12, 2);
@@ -73,7 +73,7 @@ Array has more than 5 elements
 
 ---
 
-## 📚 Documentation
+##  Documentation
 
 Full documentation is organized in the `docs/` folder:
 
@@ -88,7 +88,7 @@ Full documentation is organized in the `docs/` folder:
 
 ---
 
-## 🎯 Use Cases
+##  Use Cases
 
 * Command-line tools
 * Automation scripts
@@ -98,7 +98,7 @@ Full documentation is organized in the `docs/` folder:
 
 ---
 
-## 🛠️ Philosophy
+##  Philosophy
 
 Starlight is built to be:
 
@@ -109,7 +109,7 @@ Starlight is built to be:
 
 ---
 
-## 📄 License
+##  License
 
 MIT License © Dominex Macedon
 
@@ -118,6 +118,6 @@ MIT License © Dominex Macedon
 ## 🔗 Links
 
 * **CLI Package:** [https://www.npmjs.com/package/starlight-cli](https://www.npmjs.com/package/starlight-cli)
-* **Source Repository:** [https://github.com/](https://github.com/)developerdominex/starlight-programming-language
+* **Source Repository:** [https://github.com/](https://github.com/dominexmacedon/starlight-programming-language)
 
 
