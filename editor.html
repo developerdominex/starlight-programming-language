@@ -4,33 +4,33 @@
 <meta charset="UTF-8">
 <title>Starlight Editor</title>
 
+<!-- FontAwesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<!-- CodeMirror 6 styles -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@codemirror/basic-setup@latest/dist/index.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@codemirror/theme-one-dark@latest/dist/index.min.css">
 
 <style>
 :root {
-  --bg: #1e1e1e;
   --sidebar: #252526;
-  --editor: #1e1e1e;
-  --text: #d4d4d4;
-  --border: #333;
   --tab: #2d2d2d;
   --active-tab: #1e1e1e;
   --toolbar: #2a2a2a;
-  --button-bg: #3a3a3a;
-  --button-hover: #444;
+  --text: #d4d4d4;
+  --border: #333;
 }
 
-/* ---------- General ---------- */
 body {
   margin: 0;
   height: 100vh;
   display: flex;
-  font-family: Consolas, "Fira Code", "JetBrains Mono", monospace;
-  background: var(--bg);
+  font-family: "Fira Code", Consolas, monospace;
+  background: #1e1e1e;
   color: var(--text);
 }
 
-/* ---------- Sidebar ---------- */
+/* Sidebar */
 #sidebar {
   width: 280px;
   background: var(--sidebar);
@@ -44,25 +44,23 @@ body {
   align-items: center;
   gap: 6px;
   width: 100%;
-  background: var(--button-bg);
+  background: #3a3a3a;
   color: var(--text);
   border: 1px solid var(--border);
   padding: 6px 8px;
   cursor: pointer;
 }
 
-#sidebar button:hover {
-  background: var(--button-hover);
-}
+#sidebar button:hover { background: #444; }
 
-/* ---------- Main ---------- */
+/* Main editor area */
 #main {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-/* ---------- Toolbar ---------- */
+/* Toolbar */
 #toolbar {
   padding: 6px;
   border-bottom: 1px solid var(--border);
@@ -70,18 +68,17 @@ body {
 }
 
 #toolbar button {
-  background: var(--button-bg);
+  background: #3a3a3a;
   color: var(--text);
   border: 1px solid var(--border);
   padding: 4px 8px;
   cursor: pointer;
+  margin-right: 4px;
 }
 
-#toolbar button:hover {
-  background: var(--button-hover);
-}
+#toolbar button:hover { background: #444; }
 
-/* ---------- Tabs ---------- */
+/* Tabs */
 #tabs {
   display: flex;
   height: 36px;
@@ -97,17 +94,9 @@ body {
   cursor: pointer;
   border-right: 1px solid var(--border);
   white-space: nowrap;
-  position: relative;
 }
 
-.tab.active {
-  background: var(--active-tab);
-}
-
-.tab i {
-  margin-left: 8px;
-  color: #aaa;
-}
+.tab.active { background: var(--active-tab); }
 
 .tab .title {
   max-width: 160px;
@@ -116,21 +105,9 @@ body {
   white-space: nowrap;
 }
 
-/* ---------- Editor ---------- */
-#editor {
-  flex: 1;
-  padding: 12px;
-  outline: none;
-  white-space: pre;
-  overflow: auto;
-  font-size: 14px;
-  line-height: 1.5;
-  caret-color: white;
-  background: var(--editor);
-  color: var(--text);
-}
+.tab i { margin-left: 6px; color: #aaa; }
 
-/* ---------- File Tree ---------- */
+/* File tree */
 .tree-item {
   padding: 2px 0;
   cursor: pointer;
@@ -139,50 +116,13 @@ body {
   gap: 4px;
 }
 
-.tree-item i {
-  width: 16px;
-  flex-shrink: 0;
-}
+.tree-item i { width: 16px; flex-shrink: 0; }
 
-.folder > .children {
-  margin-left: 16px;
-  display: none;
-}
-
-.folder.open > .children {
-  display: block;
-}
-
-/* ---------- Syntax Highlight ---------- */
-.keyword { color: #569cd6; }
-.string { color: #ce9178; }
-.number { color: #b5cea8; }
-.comment { color: #6a9955; }
-
-/* ---------- Scrollbars ---------- */
-#editor::-webkit-scrollbar,
-#sidebar::-webkit-scrollbar,
-#tabs::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-#editor::-webkit-scrollbar-thumb,
-#sidebar::-webkit-scrollbar-thumb,
-#tabs::-webkit-scrollbar-thumb {
-  background: #555;
-  border-radius: 4px;
-}
-
-#editor::-webkit-scrollbar-track,
-#sidebar::-webkit-scrollbar-track,
-#tabs::-webkit-scrollbar-track {
-  background: var(--bg);
-}
-
+.folder > .children { margin-left: 16px; display: none; }
+.folder.open > .children { display: block; }
 </style>
-</head>
 
+</head>
 <body>
 
 <div id="sidebar">
@@ -196,64 +136,44 @@ body {
     <button onclick="newFile()"><i class="fa fa-file-circle-plus"></i> New File</button>
   </div>
   <div id="tabs"></div>
-  <div id="editor" contenteditable="true"></div>
+  <div id="editor"></div>
 </div>
-<script>
+
+<!-- CodeMirror 6 -->
+<script type="module">
+import { EditorView, basicSetup } from "https://cdn.jsdelivr.net/npm/@codemirror/basic-setup@latest/dist/index.min.js";
+import { EditorState } from "https://cdn.jsdelivr.net/npm/@codemirror/state@latest/dist/index.min.js";
+import { oneDark } from "https://cdn.jsdelivr.net/npm/@codemirror/theme-one-dark@latest/dist/index.min.js";
+import { HighlightStyle, tags } from "https://cdn.jsdelivr.net/npm/@codemirror/highlight@latest/dist/index.min.js";
+
+// ---------- Variables ----------
 let rootHandle;
 let openFiles = new Map();
 let activeFile = null;
 
-const editor = document.getElementById('editor');
+// ---------- CodeMirror Setup ----------
+const starlightHighlight = HighlightStyle.define([
+  { tag: tags.keyword, color: "#569cd6" },
+  { tag: tags.string, color: "#ce9178" },
+  { tag: tags.number, color: "#b5cea8" },
+  { tag: tags.comment, color: "#6a9955" }
+]);
 
-const keywords = [
-  'let','if','else','while','for','func','return',
-  'true','false','null','break','continue',
-  'import','from','as','async','await','sldeploy'
-];
+const editor = new EditorView({
+  state: EditorState.create({
+    doc: "",
+    extensions: [basicSetup, oneDark, starlightHighlight]
+  }),
+  parent: document.getElementById("editor")
+});
 
-/* ---------- Persistent Folder ---------- */
-async function saveRootHandle(handle) {
-  const db = await openDB();
-  const tx = db.transaction('handles', 'readwrite');
-  tx.objectStore('handles').put(handle, 'root');
-}
-
-async function loadRootHandle() {
-  const db = await openDB();
-  const tx = db.transaction('handles', 'readonly');
-  return tx.objectStore('handles').get('root');
-}
-
-function openDB() {
-  return new Promise((res, rej) => {
-    const req = indexedDB.open('starlight-editor', 1);
-    req.onupgradeneeded = () => req.result.createObjectStore('handles');
-    req.onsuccess = () => res(req.result);
-    req.onerror = () => rej(req.error);
-  });
-}
-
-/* ---------- Folder ---------- */
+// ---------- Folder / File Functions ----------
 async function pickFolder() {
   rootHandle = await window.showDirectoryPicker();
-  await saveRootHandle(rootHandle);
-  reloadTree();
-}
-
-async function reloadTree() {
   document.getElementById('tree').innerHTML = '';
   await loadDirectory(rootHandle, document.getElementById('tree'));
 }
 
-(async () => {
-  const saved = await loadRootHandle();
-  if (saved) {
-    rootHandle = saved;
-    await reloadTree();
-  }
-})();
-
-/* ---------- Tree ---------- */
 async function loadDirectory(dirHandle, container) {
   for await (const [name, handle] of dirHandle.entries()) {
     const item = document.createElement('div');
@@ -261,14 +181,10 @@ async function loadDirectory(dirHandle, container) {
 
     if (handle.kind === 'directory') {
       item.classList.add('folder');
-      item.innerHTML = `
-        <i class="fa fa-chevron-right"></i>
-        <i class="fa fa-folder"></i> ${name}
-      `;
+      item.innerHTML = `<i class="fa fa-chevron-right"></i> <i class="fa fa-folder"></i> ${name}`;
       const children = document.createElement('div');
       children.className = 'children';
-
-      item.onclick = async e => {
+      item.onclick = async (e) => {
         e.stopPropagation();
         item.classList.toggle('open');
         item.querySelector('.fa-chevron-right').classList.toggle('fa-rotate-90');
@@ -286,12 +202,11 @@ async function loadDirectory(dirHandle, container) {
   }
 }
 
-/* ---------- Files ---------- */
+// ---------- Open / Tabs ----------
 async function openFile(handle, name) {
   if (openFiles.has(handle)) return activateTab(handle);
   const file = await handle.getFile();
   const text = await file.text();
-
   openFiles.set(handle, { name, handle, content: text });
   createTab(handle);
   activateTab(handle);
@@ -300,15 +215,14 @@ async function openFile(handle, name) {
 function createTab(handle) {
   const tab = document.createElement('div');
   tab.className = 'tab';
-  tab.innerHTML = `
-    <span class="title">${openFiles.get(handle).name}</span>
-    <i class="fa fa-xmark"></i>
-  `;
-
-  tab.querySelector('i').onclick = e => {
-    e.stopPropagation();
-    closeTab(handle);
-  };
+  const title = document.createElement('span');
+  title.className = 'title';
+  title.textContent = openFiles.get(handle).name;
+  tab.appendChild(title);
+  const close = document.createElement('i');
+  close.className = 'fa fa-xmark';
+  close.onclick = e => { e.stopPropagation(); closeTab(handle); };
+  tab.appendChild(close);
   tab.onclick = () => activateTab(handle);
   document.getElementById('tabs').appendChild(tab);
 }
@@ -317,10 +231,9 @@ function activateTab(handle) {
   activeFile = handle;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   [...document.querySelectorAll('.tab')]
-    .find(t => t.textContent.includes(openFiles.get(handle).name))
+    .find(t => t.querySelector('.title').textContent === openFiles.get(handle).name)
     ?.classList.add('active');
-
-  editor.textContent = openFiles.get(handle).content;
+  editor.dispatch({ changes: { from: 0, to: editor.state.doc.length, insert: openFiles.get(handle).content } });
 }
 
 function closeTab(handle) {
@@ -328,14 +241,14 @@ function closeTab(handle) {
   document.getElementById('tabs').innerHTML = '';
   for (const h of openFiles.keys()) createTab(h);
   if (openFiles.size) activateTab(openFiles.keys().next().value);
-  else editor.textContent = '';
+  else editor.dispatch({ changes: { from: 0, to: editor.state.doc.length, insert: "" } });
 }
 
-/* ---------- Save / New ---------- */
+// ---------- Save / New ----------
 async function saveFile() {
   if (!activeFile) return;
   const writable = await activeFile.createWritable();
-  const text = editor.textContent;
+  const text = editor.state.doc.toString();
   await writable.write(text);
   await writable.close();
   openFiles.get(activeFile).content = text;
@@ -343,13 +256,12 @@ async function saveFile() {
 
 async function newFile() {
   if (!rootHandle) return;
-  const name = prompt('File name');
+  const name = prompt('File name:');
   if (!name) return;
   const handle = await rootHandle.getFileHandle(name, { create: true });
   openFile(handle, name);
 }
 </script>
-
 
 </body>
 </html>
