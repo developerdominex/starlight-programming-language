@@ -5,40 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Starlight Editor</title>
 
-<!-- CodeMirror 6 -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@6.0.1/dist/codemirror.min.css">
-<script src="https://cdn.jsdelivr.net/npm/@codemirror/basic-setup@6.0.1/dist/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@codemirror/view@6.0.1/dist/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@codemirror/state@6.0.1/dist/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@codemirror/lang-javascript@6.0.1/dist/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@codemirror/highlight@6.0.1/dist/index.js"></script>
-
 <!-- FontAwesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
 <style>
-  body { margin: 0; font-family: 'Fira Code', monospace; display: flex; height: 100vh; }
-  #sidebar { width: 300px; background: #1e1e1e; color: #ccc; overflow-y: auto; padding: 10px; }
-  #editor-container { flex: 1; display: flex; flex-direction: column; }
-  #tabs { height: 40px; background: #2d2d2d; display: flex; align-items: center; overflow-x: auto; }
-  .tab { padding: 5px 10px; margin-right: 2px; background: #3c3c3c; display: flex; align-items: center; cursor: pointer; }
-  .tab.active { background: #007acc; color: white; }
-  .tab i { margin-left: 5px; cursor: pointer; }
-  #editor { flex: 1; }
-  ul { list-style: none; padding-left: 0; }
-  li { display: flex; align-items: center; cursor: pointer; padding: 2px 5px; }
-  li i.folder { margin-right: 5px; }
-  li i.file { margin-right: 5px; }
-  li.collapsible > span { user-select: none; flex: 1; }
-  li.collapsible > ul { display: none; margin-left: 15px; }
-  li.collapsible.open > ul { display: block; }
-  button { cursor: pointer; }
+body { margin:0; font-family: 'Fira Code', monospace; display:flex; height:100vh; background:#1e1e1e; color:#ccc; }
+#sidebar { width:300px; background:#252526; overflow-y:auto; padding:10px; }
+#editor-container { flex:1; display:flex; flex-direction:column; }
+#tabs { height:40px; background:#333; display:flex; align-items:center; overflow-x:auto; }
+.tab { padding:5px 10px; margin-right:2px; background:#3c3c3c; display:flex; align-items:center; cursor:pointer; }
+.tab.active { background:#007acc; color:white; }
+.tab i { margin-left:5px; cursor:pointer; }
+#editor { flex:1; }
+ul { list-style:none; padding-left:0; }
+li { display:flex; align-items:center; cursor:pointer; padding:2px 5px; }
+li i.folder, li i.file { margin-right:5px; }
+li.collapsible > span { user-select:none; flex:1; }
+li.collapsible > ul { display:none; margin-left:15px; }
+li.collapsible.open > ul { display:block; }
+button { cursor:pointer; margin-bottom:5px; }
 </style>
 </head>
 <body>
 
 <div id="sidebar">
   <button id="select-folder">Select Folder</button>
+  <button id="create-file-btn">Create File</button>
   <ul id="file-tree"></ul>
 </div>
 
@@ -48,6 +40,7 @@
   <button id="save-btn" style="background:#007acc;color:white;border:none;height:40px;">Save</button>
 </div>
 
+<!-- CodeMirror 6 via CDN -->
 <script type="module">
 import {EditorView, basicSetup} from "https://cdn.jsdelivr.net/npm/@codemirror/basic-setup@6.0.1/dist/index.js";
 import {EditorState} from "https://cdn.jsdelivr.net/npm/@codemirror/state@6.0.1/dist/index.js";
@@ -57,6 +50,37 @@ import {HighlightStyle, tags} from "https://cdn.jsdelivr.net/npm/@codemirror/hig
 let folderHandle = null;
 let openFiles = {};
 let activeFile = null;
+
+// IndexedDB to store folder handle
+const DB_NAME = 'starlight-editor';
+const STORE_NAME = 'folder';
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = () => {
+      req.result.createObjectStore(STORE_NAME, { keyPath: 'id' });
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function storeFolder(handle) {
+  const db = await openDB();
+  const tx = db.transaction(STORE_NAME, 'readwrite');
+  tx.objectStore(STORE_NAME).put({ id: 'currentFolder', handle });
+  return tx.complete;
+}
+
+async function getStoredFolder() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const req = tx.objectStore(STORE_NAME).get('currentFolder');
+    req.onsuccess = () => resolve(req.result?.handle || null);
+    req.onerror = () => resolve(null);
+  });
+}
 
 // Starlight syntax highlighting
 const starlightHighlight = HighlightStyle.define([
@@ -77,12 +101,6 @@ const editor = new EditorView({
   parent: document.getElementById('editor')
 });
 
-document.getElementById('select-folder').addEventListener('click', async () => {
-  folderHandle = await window.showDirectoryPicker();
-  loadFolder(folderHandle, document.getElementById('file-tree'));
-});
-
-// Recursively list files/folders
 async function loadFolder(dirHandle, parentUl) {
   parentUl.innerHTML = '';
   for await (const [name, handle] of dirHandle.entries()) {
@@ -118,7 +136,6 @@ async function openFile(fileHandle) {
     setActiveTab(fileHandle.name);
     return;
   }
-  // Create tab
   const tab = document.createElement('div');
   tab.className = 'tab active';
   tab.textContent = fileHandle.name;
@@ -134,9 +151,7 @@ async function openFile(fileHandle) {
 
 function setActiveTab(name) {
   activeFile = name;
-  // Set editor content
   editor.dispatch({ changes: { from: 0, to: editor.state.doc.length, insert: openFiles[name].content } });
-  // Highlight active tab
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   openFiles[name].tab.classList.add('active');
 }
@@ -154,6 +169,12 @@ function closeTab(name) {
   }
 }
 
+document.getElementById('select-folder').addEventListener('click', async () => {
+  folderHandle = await window.showDirectoryPicker();
+  await storeFolder(folderHandle);
+  loadFolder(folderHandle, document.getElementById('file-tree'));
+});
+
 document.getElementById('save-btn').addEventListener('click', async () => {
   if (!activeFile) return;
   const file = openFiles[activeFile];
@@ -163,13 +184,22 @@ document.getElementById('save-btn').addEventListener('click', async () => {
   file.content = editor.state.doc.toString();
 });
 
-// Create new file
-async function createFile(name) {
+document.getElementById('create-file-btn').addEventListener('click', async () => {
   if (!folderHandle) return alert('Select a folder first');
+  const name = prompt('File name:');
+  if (!name) return;
   const handle = await folderHandle.getFileHandle(name, { create: true });
   await openFile(handle);
-}
+});
 
+// On load, restore folder if stored
+window.addEventListener('DOMContentLoaded', async () => {
+  const stored = await getStoredFolder();
+  if (stored) {
+    folderHandle = stored;
+    loadFolder(folderHandle, document.getElementById('file-tree'));
+  }
+});
 </script>
 </body>
 </html>
