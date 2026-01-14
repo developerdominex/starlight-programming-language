@@ -120,6 +120,76 @@ sldeploy(evens)</code></pre>
     <div class="example-output">
 [2, 4]
     </div>
+    <h2>8. Reduce</h2>
+<pre><code>let nums = [1, 2, 3, 4, 5]
+let total = reduce(nums, (acc, x) => acc + x, 0)
+sldeploy(total)</code></pre>
+<div class="example-output">
+15
+</div>
+<h2>9. Keys and Values</h2>
+<pre><code>let obj = {a: 1, b: 2, c: 3}
+sldeploy(keys(obj))
+sldeploy(values(obj))</code></pre>
+<div class="example-output">
+["a", "b", "c"]  
+[1, 2, 3]
+</div>
+<h2>10. Range</h2>
+<pre><code>let r1 = range(5)      // 0..4
+let r2 = range(2, 6)   // 2..5
+let r3 = range(10, 0, -2) // 10, 8, 6, 4, 2
+sldeploy(r1)
+sldeploy(r2)
+sldeploy(r3)</code></pre>
+<div class="example-output">
+[0, 1, 2, 3, 4]  
+[2, 3, 4, 5]  
+[10, 8, 6, 4, 2]
+</div>
+<h2>11. Ask User Input</h2>
+<pre><code>let name = ask("What is your name?")
+sldeploy("Hello, " + name)</code></pre>
+<div class="example-output">
+// If user types "Alice"
+// Hello, Alice
+</div>
+<h2>12. Num Conversion</h2>
+<pre><code>sldeploy(num("123"))   // 123
+sldeploy(num(true))      // 1
+sldeploy(num(false))     // 0
+sldeploy(num([1,2,3]))   // 3</code></pre>
+<div class="example-output">
+123  
+1  
+0  
+3
+</div>
+<h2>13. Str Conversion</h2>
+<pre><code>sldeploy(str(123))    // "123"
+sldeploy(str(true))   // "true"
+sldeploy(str([1,2,3])) // "1,2,3"</code></pre>
+<div class="example-output">
+"123"  
+"true"  
+"1,2,3"
+</div>
+<h2>14. Sleep / Delay</h2>
+<pre><code>print("Start")
+await sleep(1000)  // wait 1 second
+sldeploy("End")</code></pre>
+<div class="example-output">
+Start  
+(wait 1 second)  
+End
+</div>
+<h2>15. Fetch JSON</h2>
+<pre><code>let data = await get("https://jsonplaceholder.typicode.com/todos/1")
+sldeploy(data)</code></pre>
+<div class="example-output">
+{userId: 1, id: 1, title: "delectus aut autem", completed: false}
+</div>
+
   </main>
 </body>
 </html>
