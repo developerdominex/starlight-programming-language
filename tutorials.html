@@ -981,6 +981,172 @@ if player.hp > 0 { sldeploy("Congratulations! You cleared the dungeon.") }
 </pre>
 <p>Features: Interactive RPG, loops, branching, dynamic stats.</p>
 </div>
+<h3>30. Advanced Interactive Bank System</h3>
+
+<div class="description">
+  <p><strong>Concepts:</strong></p>
+  <ul>
+    <li>Persistent state</li>
+    <li>Interactive user input</li>
+    <li>Loops and conditional logic</li>
+    <li>Real-world banking simulation</li>
+  </ul>
+</div>
+
+<div class="code-block">
+<pre><code>
+# bank_system.sl
+
+let balance = 0
+
+sldeploy("Welcome to SL Bank")
+
+while true {
+  let cmd = ask("Choose: deposit / withdraw / balance / exit")
+
+  if cmd == "exit" {
+    break
+  }
+
+  if cmd == "deposit" {
+    let amount = num(ask("Enter amount to deposit:"))
+    if amount > 0 {
+      balance += amount
+      sldeploy("Deposited: $" + amount)
+    } else {
+      sldeploy("Invalid amount")
+    }
+  }
+
+  if cmd == "withdraw" {
+    let amount = num(ask("Enter amount to withdraw:"))
+    if amount > 0 and amount <= balance {
+      balance -= amount
+      sldeploy("Withdrawn: $" + amount)
+    } else {
+      sldeploy("Insufficient funds or invalid amount")
+    }
+  }
+
+  if cmd == "balance" {
+    sldeploy("Current balance: $" + balance)
+  }
+}
+
+sldeploy("Thank you for using SL Bank")
+</code></pre>
+</div>
+<h3>31. Advanced File Log Simulator</h3>
+
+<div class="description">
+  <p><strong>Concepts:</strong></p>
+  <ul>
+    <li>Log categorization</li>
+    <li>Object accumulation</li>
+    <li>For-in loops</li>
+    <li>Defensive checks</li>
+  </ul>
+</div>
+
+<div class="code-block">
+<pre><code>
+# log_simulator.sl
+
+let logs = [
+  "INFO: App started",
+  "ERROR: Disk full",
+  "WARN: High CPU usage",
+  "ERROR: Disk full",
+  "INFO: User login",
+  "WARN: Memory low"
+]
+
+let stats = {}
+
+for let line in logs {
+  let parts = line.split(":")
+  let level = parts[0]
+
+  if not stats[level] {
+    stats[level] = 0
+  }
+
+  stats[level] += 1
+}
+
+sldeploy("Log statistics:")
+for let key in keys(stats) {
+  sldeploy(key + " -> " + stats[key])
+}
+</code></pre>
+</div>
+
+<div class="output-block">
+<pre>
+INFO -> 2
+ERROR -> 2
+WARN -> 2
+</pre>
+</div>
+<h3>32. Advanced Interactive Voting System</h3>
+
+<div class="description">
+  <p><strong>Concepts:</strong></p>
+  <ul>
+    <li>Dynamic user input</li>
+    <li>Vote counting</li>
+    <li>Winner detection</li>
+    <li>Real-world election logic</li>
+  </ul>
+</div>
+
+<div class="code-block">
+<pre><code>
+# voting_system.sl
+
+let candidates = []
+let votes = {}
+
+let count = num(ask("How many candidates?"))
+
+for let i in range(0, count) {
+  let name = ask("Candidate " + (i + 1) + " name:")
+  candidates = candidates + [name]
+  votes[name] = 0
+}
+
+let voters = num(ask("How many voters?"))
+
+for let i in range(0, voters) {
+  sldeploy("Candidates:")
+  for let c in candidates {
+    sldeploy("- " + c)
+  }
+
+  let choice = ask("Vote by typing candidate name:")
+  if votes[choice] != null {
+    votes[choice] += 1
+  } else {
+    sldeploy("Invalid vote")
+  }
+}
+
+let winner = candidates[0]
+
+for let c in candidates {
+  if votes[c] > votes[winner] {
+    winner = c
+  }
+}
+
+sldeploy("Election Results:")
+for let c in candidates {
+  sldeploy(c + " -> " + votes[c])
+}
+
+sldeploy("Winner: " + winner)
+</code></pre>
+</div>
 
   </main>
 </body>
