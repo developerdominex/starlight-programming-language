@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight Tutorials</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 2rem; background: #f9f9f9; color: #333; }
+        h1, h2 { color: #2c3e50; }
+        code { background: #eee; padding: 0.2rem 0.4rem; border-radius: 3px; font-family: monospace; }
+        pre { background: #eee; padding: 1rem; border-radius: 5px; overflow-x: auto; }
+        section { margin-bottom: 3rem; }
+    </style>
+</head>
+<body>
+
+```
+<h1>Starlight Tutorials</h1>
+
+<section>
+    <h2>1. Variables</h2>
+    <p>In Starlight, you must declare variables using <code>let</code> or <code>define</code>.</p>
+    <pre><code>let x = 10
+```
+
+let y = 20
+define pi = 3.14</code></pre> </section>
+
+```
+<section>
+    <h2>2. Loops</h2>
+    <p>Use <code>for</code> or <code>while</code> loops to iterate.</p>
+    <pre><code>let arr = range(1, 6)
+```
+
+let sum = 0
+
+for x in arr {
+sum = sum + x
+}
+sldeploy sum  # Outputs: 15</code></pre> </section>
+
+```
+<section>
+    <h2>3. Conditionals</h2>
+    <pre><code>let n = 7
+```
+
+if n % 2 == 0 then
+sldeploy "Even"
+else
+sldeploy "Odd"</code></pre> </section>
+
+```
+<section>
+    <h2>4. Functions & Arrow Functions</h2>
+    <pre><code>define add = (a, b) => a + b
+```
+
+sldeploy add(3, 5)  # Outputs: 8
+
+let square = x => x * x
+sldeploy square(4)   # Outputs: 16</code></pre> </section>
+
+```
+<section>
+    <h2>5. Arrays</h2>
+    <pre><code>let arr = [1, 2, 3, 4, 5]
+```
+
+let doubled = map(arr, x => x * 2)
+sldeploy doubled  # Outputs: [2, 4, 6, 8, 10]</code></pre> </section>
+
+```
+<section>
+    <h2>6. Objects</h2>
+    <pre><code>let person = define {
+name: "Alice",
+age: 20,
+greet: x => "Hello " + x
+```
+
+}
+
+sldeploy person.name         # Alice
+sldeploy person.greet("Bob") # Hello Bob
+person.city = "NYC"
+sldeploy person  # { name: Alice, age: 20, greet: <function>, city: NYC }</code></pre> </section>
+
+```
+<section>
+    <h2>7. Built-in Functions</h2>
+    <pre><code>len([1,2,3])        # 3
+```
+
+len("hello")       # 5
+keys({a:1, b:2})    # ["a", "b"]
+values({a:1, b:2})  # [1, 2]
+
+sleep(1000)         # Waits 1 second
+ask("Name?")      # Prompts user input</code></pre> </section>
+
+```
+<section>
+    <h2>8. Higher-order functions</h2>
+    <pre><code>let nums = range(1, 6)
+```
+
+let evens = filter(nums, x => x % 2 == 0)
+sldeploy evens   # [2,4]
+
+let sum = reduce(nums, (acc, x) => acc + x, 0)
+sldeploy sum     # 15</code></pre> </section>
+
+</body>
+</html>
