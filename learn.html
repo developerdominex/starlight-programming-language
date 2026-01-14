@@ -8,22 +8,18 @@
 <!-- Marked -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
+<!-- Prism.js CSS & JS -->
+<link href="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-javascript.min.js"></script> <!-- You can add more languages if needed -->
+
 <!-- Font -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code&display=swap" rel="stylesheet">
 
 <style>
 /* ===================== RESET ===================== */
-/* ===================== RESET ===================== */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html, body {
-  height: 100%;
-  scroll-behavior: smooth;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; scroll-behavior: smooth; }
 
 /* ===================== COLORS ===================== */
 :root {
@@ -35,28 +31,11 @@ html, body {
   --accent: #38bdf8;
   --hover: #1e293b;
   --border: #1f2937;
-  --code-bg: #1e293b;
   --table-header: #1f2937;
-
-  /* Syntax Colors */
-  --keyword: #7c3aed;       /* purple */
-  --operator: #38bdf8;      /* accent */
-  --number: #22c55e;        /* green */
-  --string: #f472b6;        /* pink */
-  --comment: #64748b;       /* gray */
-  --function: #facc15;      /* yellow */
-  --variable: #38bdf8;      /* blue */
-  --punctuation: #e5e7eb;   /* light text */
 }
 
 /* ===================== BODY ===================== */
-body {
-  display: flex;
-  font-family: 'Inter', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  overflow: hidden;
-}
+body { display: flex; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
 
 /* ===================== SIDEBAR ===================== */
 #sidebar {
@@ -68,39 +47,13 @@ body {
   scrollbar-width: thin;
   scrollbar-color: var(--accent) transparent;
 }
-
 #sidebar::-webkit-scrollbar { width: 6px; }
-#sidebar::-webkit-scrollbar-thumb {
-  background-color: var(--accent);
-  border-radius: 3px;
-}
+#sidebar::-webkit-scrollbar-thumb { background-color: var(--accent); border-radius: 3px; }
 
-#sidebar h2 {
-  font-size: 18px;
-  margin-bottom: 20px;
-  font-weight: 600;
-  color: white;
-}
-
+#sidebar h2 { font-size: 18px; margin-bottom: 20px; font-weight: 600; color: white; }
 .section { margin-bottom: 30px; }
-.section-title {
-  font-size: 12px;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 8px;
-  letter-spacing: 0.5px;
-}
-.item {
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  color: var(--text);
-  transition: all 0.2s;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
+.section-title { font-size: 12px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.5px; }
+.item { padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; color: var(--text); transition: all 0.2s; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
 .item:hover { background: var(--hover); color: var(--accent); }
 .item.active { background: var(--accent); color: #0f172a; font-weight: 600; }
 
@@ -112,144 +65,51 @@ body {
   scrollbar-width: thin;
   scrollbar-color: var(--accent) transparent;
 }
-
 #content::-webkit-scrollbar { width: 6px; }
-#content::-webkit-scrollbar-thumb {
-  background-color: var(--accent);
-  border-radius: 3px;
-}
+#content::-webkit-scrollbar-thumb { background-color: var(--accent); border-radius: 3px; }
 
-#content h1, #content h2, #content h3, #content h4 {
-  color: white;
-  margin-bottom: 15px;
-  font-weight: 600;
-}
-#content h1 { font-size: 32px; }
-#content h2 { font-size: 26px; }
-#content h3 { font-size: 20px; }
-#content h4 { font-size: 16px; }
-
-#content p {
-  line-height: 1.7;
-  margin-bottom: 15px;
-  color: var(--text);
-  font-size: 15px;
-}
-#content a {
-  color: var(--accent);
-  text-decoration: none;
-  transition: all 0.2s;
-}
+#content h1, #content h2, #content h3, #content h4 { color: white; margin-bottom: 15px; font-weight: 600; }
+#content h1 { font-size: 32px; } #content h2 { font-size: 26px; } #content h3 { font-size: 20px; } #content h4 { font-size: 16px; }
+#content p { line-height: 1.7; margin-bottom: 15px; color: var(--text); font-size: 15px; }
+#content a { color: var(--accent); text-decoration: none; transition: all 0.2s; }
 #content a:hover { text-decoration: underline; }
 
-/* ===================== CODE & PRE ===================== */
-#content pre {
-  background: var(--code-bg);
-  padding: 15px;
-  border-radius: 8px;
-  overflow-x: auto;
-  font-family: 'Fira Code', monospace;
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
-#content code {
-  font-family: 'Fira Code', monospace;
-  background: var(--code-bg);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 14px;
-  color: var(--text);
-}
-
-/* Inline vs block code */
-#content pre code { background: transparent; padding: 0; display: block; }
-
-/* --------------------- SYNTAX HIGHLIGHTING --------------------- */
-#content pre code .keyword { color: var(--keyword); font-weight: 600; }
-#content pre code .operator { color: var(--operator); font-weight: 600; }
-#content pre code .number { color: var(--number); }
-#content pre code .string { color: var(--string); }
-#content pre code .comment { color: var(--comment); font-style: italic; }
-#content pre code .function { color: var(--function); }
-#content pre code .variable { color: var(--variable); }
-#content pre code .punctuation { color: var(--punctuation); }
-
-/* Optional: highlight inline code operators */
-#content code.operator { color: var(--operator); font-weight: 600; }
-
-/* ===================== BLOCKQUOTES ===================== */
-#content blockquote {
-  border-left: 4px solid var(--accent);
-  padding-left: 16px;
-  color: var(--muted);
-  margin: 15px 0;
-  font-style: italic;
-  background: var(--hover);
-  border-radius: 6px;
-}
-
-/* ===================== LISTS ===================== */
-#content ul, #content ol { padding-left: 20px; margin-bottom: 15px; }
-#content ul li::marker { color: var(--accent); }
-#content ol li::marker { color: var(--accent); }
-
 /* ===================== TABLES ===================== */
-#content table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-  font-size: 14px;
-}
-#content th, #content td {
-  border: 1px solid var(--border);
-  padding: 10px 12px;
-  text-align: left;
-}
-#content th {
-  background: var(--table-header);
-  color: white;
-  font-weight: 600;
-}
+#content table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
+#content th, #content td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; }
+#content th { background: var(--table-header); color: white; font-weight: 600; }
 #content tr:nth-child(even) { background: var(--hover); }
 
+/* ===================== BLOCKQUOTES ===================== */
+#content blockquote { border-left: 4px solid var(--accent); padding-left: 16px; color: var(--muted); margin: 15px 0; font-style: italic; background: var(--hover); border-radius: 6px; }
+
 /* ===================== IMAGES ===================== */
-#content img {
-  max-width: 100%;
-  border-radius: 6px;
-  margin: 15px 0;
-  display: block;
-}
+#content img { max-width: 100%; border-radius: 6px; margin: 15px 0; display: block; }
 
 /* ===================== MISC ===================== */
-#content hr {
-  border: 0;
-  height: 1px;
-  background: var(--border);
-  margin: 20px 0;
-}
-#content details {
-  background: var(--hover);
-  padding: 10px 15px;
-  border-radius: 6px;
-  margin: 15px 0;
-}
-#content summary {
-  cursor: pointer;
-  font-weight: 500;
-  color: var(--accent);
-}
+#content hr { border: 0; height: 1px; background: var(--border); margin: 20px 0; }
+#content details { background: var(--hover); padding: 10px 15px; border-radius: 6px; margin: 15px 0; }
+#content summary { cursor: pointer; font-weight: 500; color: var(--accent); }
 
 /* ===================== TRANSITIONS ===================== */
 #sidebar, #content { transition: all 0.3s ease; }
 
+/* ===================== PRISM MODIFICATIONS ===================== */
+/* Use custom colors for operators, keywords, functions, strings, numbers */
+.token.operator { color: var(--accent); font-weight: 600; }
+.token.keyword { color: #7c3aed; font-weight: 600; }
+.token.string { color: #f472b6; }
+.token.function { color: #facc15; }
+.token.number { color: #22c55e; }
+.token.comment { color: var(--muted); font-style: italic; }
+.token.punctuation { color: var(--text); }
+.token.variable { color: var(--accent); }
 </style>
 </head>
 <body>
 
 <div id="sidebar">
   <h2>Starlight Docs</h2>
-
   <div class="section">
     <div class="section-title">Getting Started</div>
     <div class="item" data-md="README.md">Overview</div>
@@ -319,66 +179,43 @@ body {
 
 <script>
 /* ===================== CONFIG ===================== */
-const RAW_BASE =
-  "https://raw.githubusercontent.com/dominexmacedon/starlight-programming-language/main/";
-
-/* ===================== ELEMENTS ===================== */
+const RAW_BASE = "https://raw.githubusercontent.com/dominexmacedon/starlight-programming-language/main/";
 const content = document.getElementById("content");
 const items = document.querySelectorAll(".item");
 
 /* ===================== HELPERS ===================== */
 function fixRelativePaths(container, basePath) {
-  // Fix images
   container.querySelectorAll("img").forEach(img => {
     const src = img.getAttribute("src");
     if (!src) return;
-
-    if (
-      !src.startsWith("http://") &&
-      !src.startsWith("https://") &&
-      !src.startsWith("data:")
-    ) {
-      img.src =
-        RAW_BASE +
-        (basePath ? basePath + "/" : "") +
-        src.replace(/^\.?\//, "");
+    if (!src.startsWith("http://") && !src.startsWith("https://") && !src.startsWith("data:")) {
+      img.src = RAW_BASE + (basePath ? basePath + "/" : "") + src.replace(/^\.?\//, "");
     }
   });
-
-  // Fix markdown links to other .md files
   container.querySelectorAll("a").forEach(a => {
     const href = a.getAttribute("href");
     if (!href) return;
-
     if (href.endsWith(".md")) {
-      a.addEventListener("click", e => {
-        e.preventDefault();
-        loadMarkdown(href);
-      });
+      a.addEventListener("click", e => { e.preventDefault(); loadMarkdown(href); });
     }
   });
 }
 
-/* ===================== LOADER ===================== */
+/* ===================== LOAD MARKDOWN ===================== */
 async function loadMarkdown(path) {
   content.innerHTML = "<p>Loading...</p>";
-
   try {
     const res = await fetch(RAW_BASE + path);
     if (!res.ok) throw new Error("Failed to load");
-
     const md = await res.text();
-
-    // Render markdown
     content.innerHTML = marked.parse(md);
-
-    // Resolve relative assets
     const basePath = path.split("/").slice(0, -1).join("/");
     fixRelativePaths(content, basePath);
 
+    // Highlight all code blocks with Prism.js
+    Prism.highlightAll();
   } catch (err) {
-    content.innerHTML =
-      "<h2>Error</h2><p>Unable to load documentation.</p>";
+    content.innerHTML = "<h2>Error</h2><p>Unable to load documentation.</p>";
   }
 }
 
