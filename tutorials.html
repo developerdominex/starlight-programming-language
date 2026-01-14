@@ -78,7 +78,7 @@ sldeploy(doubled)</code></pre>
 
     
 
-    <h2>4. Loops</h2>
+    <h2>3. Loops</h2>
     <pre><code>let sum = 0
 for i in range(1, 6) {
     sum += i
@@ -88,7 +88,7 @@ sldeploy(sum)</code></pre>
 15
     </div>
 
-    <h2>5. Functions</h2>
+    <h2>4. Functions</h2>
     <pre><code>define square = x => x * x
 let result = square(5)
 sldeploy(result)</code></pre>
@@ -96,7 +96,7 @@ sldeploy(result)</code></pre>
 25
     </div>
 
-    <h2>6. Objects</h2>
+    <h2>5. Objects</h2>
     <pre><code>let person = {
     name: "Alice",
     age: 20,
@@ -107,21 +107,21 @@ sldeploy(person)</code></pre>
 {name: "Alice", age: 20, greet: <function>}
     </div>
 
-    <h2>7. Built-in functions</h2>
+    <h2>6. Built-in functions</h2>
     <pre><code>let nums = [1,2,3,4,5]
 let evens = filter(nums, x => x % 2 == 0)
 sldeploy(evens)</code></pre>
     <div class="example-output">
 [2, 4]
     </div>
-    <h2>8. Reduce</h2>
+    <h2>7. Reduce</h2>
 <pre><code>let nums = [1, 2, 3, 4, 5]
 let total = reduce(nums, (acc, x) => acc + x, 0)
 sldeploy(total)</code></pre>
 <div class="example-output">
 15
 </div>
-<h2>9. Keys and Values</h2>
+<h2>8. Keys and Values</h2>
 <pre><code>let obj = {a: 1, b: 2, c: 3}
 sldeploy(keys(obj))
 sldeploy(values(obj))</code></pre>
@@ -129,7 +129,7 @@ sldeploy(values(obj))</code></pre>
 ["a", "b", "c"]  
 [1, 2, 3]
 </div>
-<h2>10. Range</h2>
+<h2>9. Range</h2>
 <pre><code>let r1 = range(5)      // 0..4
 let r2 = range(2, 6)   // 2..5
 let r3 = range(10, 0, -2) // 10, 8, 6, 4, 2
@@ -141,14 +141,14 @@ sldeploy(r3)</code></pre>
 [2, 3, 4, 5]  
 [10, 8, 6, 4, 2]
 </div>
-<h2>11. Ask User Input</h2>
+<h2>10. Ask User Input</h2>
 <pre><code>let name = ask("What is your name?")
 sldeploy("Hello, " + name)</code></pre>
 <div class="example-output">
 // If user types "Alice"
 // Hello, Alice
 </div>
-<h2>12. Num Conversion</h2>
+<h2>11. Num Conversion</h2>
 <pre><code>sldeploy(num("123"))   // 123
 sldeploy(num(true))      // 1
 sldeploy(num(false))     // 0
@@ -159,7 +159,7 @@ sldeploy(num([1,2,3]))   // 3</code></pre>
 0  
 3
 </div>
-<h2>13. Str Conversion</h2>
+<h2>12. Str Conversion</h2>
 <pre><code>sldeploy(str(123))    // "123"
 sldeploy(str(true))   // "true"
 sldeploy(str([1,2,3])) // "1,2,3"</code></pre>
@@ -168,7 +168,7 @@ sldeploy(str([1,2,3])) // "1,2,3"</code></pre>
 "true"  
 "1,2,3"
 </div>
-<h2>14. Sleep / Delay</h2>
+<h2>13. Sleep / Delay</h2>
 <pre><code>print("Start")
 await sleep(1000)  // wait 1 second
 sldeploy("End")</code></pre>
@@ -177,11 +177,101 @@ Start
 (wait 1 second)  
 End
 </div>
-<h2>15. Fetch JSON</h2>
+<h2>14. Fetch JSON</h2>
 <pre><code>let data = await get("https://jsonplaceholder.typicode.com/todos/1")
 sldeploy(data)</code></pre>
 <div class="example-output">
 {userId: 1, id: 1, title: "delectus aut autem", completed: false}
+</div>
+<h2>15. Advanced Loops (for in / for let in)</h2>
+
+<p>
+Starlight provides two loop forms:
+<code>for in</code> and <code>for let in</code>.
+Arrays are immutable and do not support <code>.push()</code>.
+Use array concatenation instead.
+</p>
+
+<h3>15.1 for let in (Scoped variable)</h3>
+<pre><code>let names = ["Ana", "Mark", "Lena"]
+
+for let n in names {
+  sldeploy("Hello " + n)
+}</code></pre>
+
+<div class="example-output">
+Hello Ana  
+Hello Mark  
+Hello Lena
+</div>
+
+<h3>15.2 Filtering data with continue</h3>
+<pre><code>let numbers = [3, -1, 0, 7, 9]
+let positives = []
+
+for let x in numbers {
+  if x <= 0 {
+    continue
+  }
+  positives = positives + [x]
+}
+
+sldeploy(positives)</code></pre>
+
+<div class="example-output">
+[3, 7, 9]
+</div>
+
+<h3>15.3 Iterating objects with nested loops</h3>
+<pre><code>let scores = {
+  math: [90, 85],
+  physics: [92, 80]
+}
+
+for let subject in scores {
+  let total = 0
+  let count = 0
+
+  for let s in scores[subject] {
+    total += s
+    count += 1
+  }
+
+  let avg = total / count
+  sldeploy(subject + " avg = " + avg)
+}</code></pre>
+
+<div class="example-output">
+math avg = 87.5  
+physics avg = 86
+</div>
+
+<h3>15.4 Real-world example: filter adults</h3>
+<pre><code>let users = [
+  { name: "Ana", age: 17 },
+  { name: "Mark", age: 22 },
+  { name: "Lena", age: 15 },
+  { name: "Tom", age: 30 }
+]
+
+let adults = []
+
+for let u in users {
+  if u.age < 18 {
+    continue
+  }
+  adults = adults + [u.name]
+}
+
+sldeploy("Adult users:")
+for let name in adults {
+  sldeploy("- " + name)
+}</code></pre>
+
+<div class="example-output">
+Adult users:  
+- Mark  
+- Tom
 </div>
 
   </main>
