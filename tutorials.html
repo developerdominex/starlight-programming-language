@@ -1,117 +1,125 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Starlight Tutorials</title>
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 2rem; background: #f9f9f9; color: #333; }
-        h1, h2 { color: #2c3e50; }
-        code { background: #eee; padding: 0.2rem 0.4rem; border-radius: 3px; font-family: monospace; }
-        pre { background: #eee; padding: 1rem; border-radius: 5px; overflow-x: auto; }
-        section { margin-bottom: 3rem; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Starlight Language Tutorial</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #1e1e1e;
+      color: #e0e0e0;
+    }
+    header {
+      background-color: #282c34;
+      padding: 1rem;
+      text-align: center;
+    }
+    h1 {
+      margin: 0;
+      color: #61dafb;
+    }
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background-color: #2a2a2a;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+    h2 {
+      color: #61dafb;
+      margin-top: 1.5rem;
+    }
+    pre {
+      background-color: #1c1c1c;
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      color: #9cdcfe;
+    }
+    code {
+      font-family: monospace;
+    }
+    .example-output {
+      background-color: #252525;
+      border-left: 4px solid #61dafb;
+      padding: 0.5rem 1rem;
+      margin: 0.5rem 0 1rem 0;
+      white-space: pre-wrap;
+    }
+  </style>
 </head>
 <body>
-
-```
-<h1>Starlight Tutorials</h1>
-
-<section>
+  <header>
+    <h1>Starlight Language Tutorial</h1>
+  </header>
+  <main>
     <h2>1. Variables</h2>
-    <p>In Starlight, you must declare variables using <code>let</code> or <code>define</code>.</p>
-    <pre><code>let x = 10
-```
+    <p>Use <code>let</code> or <code>define</code> to create variables:</p>
+    <pre><code>let a = 10
+define b = "hello"
+sldeploy(a, b)</code></pre>
+    <div class="example-output">
+a: 10  
+b: hello
+    </div>
 
-let y = 20
-define pi = 3.14</code></pre> </section>
-
-```
-<section>
-    <h2>2. Loops</h2>
-    <p>Use <code>for</code> or <code>while</code> loops to iterate.</p>
-    <pre><code>let arr = range(1, 6)
-```
-
-let sum = 0
-
-for x in arr {
-sum = sum + x
-}
-sldeploy sum  # Outputs: 15</code></pre> </section>
-
-```
-<section>
-    <h2>3. Conditionals</h2>
-    <pre><code>let n = 7
-```
-
-if n % 2 == 0 then
-sldeploy "Even"
-else
-sldeploy "Odd"</code></pre> </section>
-
-```
-<section>
-    <h2>4. Functions & Arrow Functions</h2>
-    <pre><code>define add = (a, b) => a + b
-```
-
-sldeploy add(3, 5)  # Outputs: 8
-
-let square = x => x * x
-sldeploy square(4)   # Outputs: 16</code></pre> </section>
-
-```
-<section>
-    <h2>5. Arrays</h2>
-    <pre><code>let arr = [1, 2, 3, 4, 5]
-```
-
+    <h2>2. Arrays</h2>
+    <p>Create arrays and use built-in functions:</p>
+    <pre><code>let arr = [1,2,3,4,5]
 let doubled = map(arr, x => x * 2)
-sldeploy doubled  # Outputs: [2, 4, 6, 8, 10]</code></pre> </section>
+sldeploy(doubled)</code></pre>
+    <div class="example-output">
+[2, 4, 6, 8, 10]
+    </div>
 
-```
-<section>
-    <h2>6. Objects</h2>
-    <pre><code>let person = define {
-name: "Alice",
-age: 20,
-greet: x => "Hello " + x
-```
+    <h2>3. Conditionals</h2>
+    <pre><code>let x = 7
+let y = if x % 2 == 0 then "even" else "odd"
+sldeploy(y)</code></pre>
+    <div class="example-output">
+odd
+    </div>
 
+    <h2>4. Loops</h2>
+    <pre><code>let sum = 0
+for i in range(1, 6) {
+    sum += i
 }
+sldeploy(sum)</code></pre>
+    <div class="example-output">
+15
+    </div>
 
-sldeploy person.name         # Alice
-sldeploy person.greet("Bob") # Hello Bob
-person.city = "NYC"
-sldeploy person  # { name: Alice, age: 20, greet: <function>, city: NYC }</code></pre> </section>
+    <h2>5. Functions</h2>
+    <pre><code>define square = x => x * x
+let result = square(5)
+sldeploy(result)</code></pre>
+    <div class="example-output">
+25
+    </div>
 
-```
-<section>
-    <h2>7. Built-in Functions</h2>
-    <pre><code>len([1,2,3])        # 3
-```
+    <h2>6. Objects</h2>
+    <pre><code>let person = {
+    name: "Alice",
+    age: 20,
+    greet: () => "Hello"
+}
+sldeploy(person)</code></pre>
+    <div class="example-output">
+{name: "Alice", age: 20, greet: <function>}
+    </div>
 
-len("hello")       # 5
-keys({a:1, b:2})    # ["a", "b"]
-values({a:1, b:2})  # [1, 2]
-
-sleep(1000)         # Waits 1 second
-ask("Name?")      # Prompts user input</code></pre> </section>
-
-```
-<section>
-    <h2>8. Higher-order functions</h2>
-    <pre><code>let nums = range(1, 6)
-```
-
+    <h2>7. Built-in functions</h2>
+    <pre><code>let nums = [1,2,3,4,5]
 let evens = filter(nums, x => x % 2 == 0)
-sldeploy evens   # [2,4]
-
-let sum = reduce(nums, (acc, x) => acc + x, 0)
-sldeploy sum     # 15</code></pre> </section>
-
+sldeploy(evens)</code></pre>
+    <div class="example-output">
+[2, 4]
+    </div>
+  </main>
 </body>
 </html>
