@@ -1147,6 +1147,90 @@ for let c in candidates {
 sldeploy("Winner: " + winner)
 </code></pre>
 </div>
+<h3>33. Advanced: Safe Banking Transaction (do / track)</h3>
+
+<pre><code># safe_bank_transaction.sl
+
+let balance = 100
+
+sldeploy("Initial balance: $" + balance)
+
+do {
+  let action = ask("Choose action: deposit or withdraw")
+
+  if action != "deposit" and action != "withdraw" {
+    error("Invalid action selected")
+  }
+
+  let amount = num(ask("Enter amount:"))
+
+  if amount <= 0 {
+    error("Amount must be greater than zero")
+  }
+
+  if action == "withdraw" {
+    if amount > balance {
+      error("Insufficient funds")
+    }
+    balance -= amount
+  }
+
+  if action == "deposit" {
+    balance += amount
+  }
+
+  sldeploy("Transaction successful")
+  sldeploy("New balance: $" + balance)
+}
+track {
+  sldeploy("Transaction failed!")
+  sldeploy("Reason: " + error.message)
+  sldeploy("Balance unchanged: $" + balance)
+}
+
+sldeploy("Program finished safely.")
+</code></pre>
+
+<div class="example-output">
+Initial balance: $100  
+Transaction successful  
+New balance: $150  
+—or—  
+Transaction failed!  
+Reason: Insufficient funds  
+Balance unchanged: $100
+</div>
+<h3>34. Advanced Async Error Handling: API Safe Fetch</h3>
+
+<pre><code># api_safe_fetch.sl
+
+let data = null
+
+do {
+  sldeploy("Fetching data...")
+  data = await get("https://api.example.com/data")
+
+  if data == null {
+    error("API returned no data")
+  }
+
+  sldeploy("Data fetched successfully")
+}
+track {
+  sldeploy("Fetch failed")
+  sldeploy("Using fallback data")
+  data = { status: "offline", items: [] }
+}
+
+sldeploy("Final data status: " + data.status)
+</code></pre>
+
+<div class="example-output">
+Fetching data...  
+Fetch failed  
+Using fallback data  
+Final data status: offline
+</div>
 
   </main>
 </body>
