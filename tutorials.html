@@ -644,6 +644,343 @@ Password strength stats:<br>
 Strong: 2<br>
 Weak: 3
 </div>
+<h3>18. Interactive Survey – Ask User Input</h3>
+<div class="sl-code">
+<pre>
+# interactive_survey.sl
+
+let name = ask("What is your name?")
+let age = ask("How old are you?")
+let favoriteColor = ask("What is your favorite color?")
+
+sldeploy("Survey Results:")
+sldeploy("Name: " + name)
+sldeploy("Age: " + age)
+sldeploy("Favorite color: " + favoriteColor)
+
+if num(age) >= 18 {
+  sldeploy("You are an adult.")
+} else {
+  sldeploy("You are a minor.")
+}
+</pre>
+<p>Features: ask input, conditional branching, string concatenation, numeric conversion.</p>
+</div>
+
+<h3>19. Async Weather Fetcher</h3>
+<div class="sl-code">
+<pre>
+# weather_fetch.sl
+
+let city = ask("Enter a city name:")
+let weatherData = await get("https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=YOUR_API_KEY&units=metric")
+
+sldeploy("Weather in " + city + ":")
+sldeploy("Temperature: " + weatherData.main.temp + "°C")
+sldeploy("Condition: " + weatherData.weather[0].description)
+</pre>
+<p>Features: Async API request, await, JSON access, dynamic string interpolation.</p>
+</div>
+
+<h3>20. Turn-Based Battle Game</h3>
+<div class="sl-code">
+<pre>
+# battle_game.sl
+
+let hero = { name: ask("Enter hero name:"), hp: 50, attack: 10 }
+let monster = { name: "Goblin", hp: 30, attack: 8 }
+
+while hero.hp > 0 and monster.hp > 0 {
+  let action = ask("Choose action: attack or heal").toLowerCase()
+
+  if action == "attack" {
+    monster.hp -= hero.attack
+    sldeploy(hero.name + " attacks " + monster.name + " -> " + monster.hp + " HP left")
+  } else if action == "heal" {
+    hero.hp += 5
+    sldeploy(hero.name + " heals -> " + hero.hp + " HP")
+  } else {
+    sldeploy("Invalid action!")
+  }
+
+  if monster.hp <= 0 { break }
+
+  hero.hp -= monster.attack
+  sldeploy(monster.name + " attacks " + hero.name + " -> " + hero.hp + " HP left")
+}
+
+if hero.hp > 0 {
+  sldeploy(hero.name + " wins!")
+} else {
+  sldeploy(monster.name + " wins!")
+}
+</pre>
+<p>Features: Interactive game, while loops, branching, dynamic stats.</p>
+</div>
+
+<h3>21. Password Strength Checker – Interactive</h3>
+<div class="sl-code">
+<pre>
+# password_checker.sl
+
+let passwords = []
+
+while true {
+  let pwd = ask("Enter a password (or 'done' to finish):")
+  if pwd.toLowerCase() == "done" { break }
+  passwords = passwords + [pwd]
+}
+
+let stats = { strong: 0, weak: 0 }
+
+for let p in passwords {
+  let score = 0
+  if p.len >= 8 { score += 1 }
+  if p.match("[A-Z]") { score += 1 }
+  if p.match("[0-9]") { score += 1 }
+  if p.match("[^a-zA-Z0-9]") { score += 1 }
+
+  if score >= 3 { stats.strong += 1 } else { stats.weak += 1 }
+}
+
+sldeploy("Password strength stats:")
+sldeploy("Strong: " + stats.strong)
+sldeploy("Weak: " + stats.weak)
+</pre>
+<p>Features: ask loop, arrays, regex matching, scoring logic.</p>
+</div>
+
+<h3>22. Async Todo List Filter</h3>
+<div class="sl-code">
+<pre>
+# todos_filter.sl
+
+let userId = num(ask("Enter user ID to filter tasks:"))
+
+let todos = await get("https://jsonplaceholder.typicode.com/todos")
+let completed = []
+
+for let t in todos {
+  if t.userId == userId and t.completed {
+    completed = completed + [t.title]
+  }
+}
+
+sldeploy("Completed tasks for user " + userId + ":")
+for let title in completed {
+  sldeploy("- " + title)
+}
+</pre>
+<p>Features: Async fetching, filtering, interactive input.</p>
+</div>
+
+<h3>23. Multi-Battle Fixed</h3>
+<div class="sl-code">
+<pre>
+# multi_battle_fixed.sl
+
+let numPlayers = num(ask("How many heroes?"))
+let heroes = []
+
+for let i in range(0, numPlayers) {
+  let name = ask("Enter hero " + (i + 1) + " name:")
+  heroes = heroes + [{ name: name, hp: 50, attack: 8 + i }]
+}
+
+let monster = { name: "Dragon", hp: 100, attack: 12 }
+
+while monster.hp > 0 and len(heroes.filter(h => h.hp > 0)) > 0 {
+  for let h in heroes {
+    if h.hp <= 0 { continue }
+    monster.hp -= h.attack
+    sldeploy(h.name + " attacks " + monster.name + " -> " + monster.hp + " HP left")
+    if monster.hp <= 0 { break }
+  }
+
+  if monster.hp <= 0 { break }
+
+  let alive = heroes.filter(h => h.hp > 0)
+  if len(alive) > 0 {
+    let target = alive[0]
+    target.hp -= monster.attack
+    sldeploy(monster.name + " attacks " + target.name + " -> " + target.hp + " HP left")
+  }
+}
+
+if monster.hp <= 0 { 
+  sldeploy("Heroes win!") 
+} else { 
+  sldeploy(monster.name + " wins!") 
+}
+</pre>
+<p>Features: Multi-character battle, loops, filtering, interactive input.</p>
+</div>
+
+<h3>24. Real-Time Stock Analyzer (Async + Interactive)</h3>
+<div class="sl-code">
+<pre>
+# stock_analyzer.sl
+
+let tickers = ask("Enter stock symbols separated by commas:").split(",")
+
+let stocks = []
+for let t in tickers {
+  let data = await get("https://api.example.com/stocks/" + t.trim())
+  stocks = stocks + [{ symbol: t.trim(), price: data.price, change: data.change }]
+}
+
+let winners = stocks.filter(s => s.change > 0)
+let losers = stocks.filter(s => s.change <= 0)
+
+sldeploy("Winners:")
+for let s in winners { 
+  sldeploy(s.symbol + " -> $" + s.price + " (+" + s.change + "%)") 
+}
+
+sldeploy("Losers:")
+for let s in losers { 
+  sldeploy(s.symbol + " -> $" + s.price + " (" + s.change + "%)") 
+}
+</pre>
+<p>Features: Async fetching, filter, string processing, interactive input.</p>
+</div>
+
+<h3>25. Interactive Quiz with Scoring</h3>
+<div class="sl-code">
+<pre>
+# quiz.sl
+
+let questions = [
+  { q: "2 + 2 = ?", a: "4" },
+  { q: "Capital of France?", a: "Paris" },
+  { q: "5 * 6 = ?", a: "30" }
+]
+
+let score = 0
+
+for let i in range(0, len(questions)) {
+  let answer = ask(questions[i].q)
+  if answer.trim().toLowerCase() == questions[i].a.toLowerCase() {
+    sldeploy("Correct!")
+    score += 1
+  } else {
+    sldeploy("Wrong! Answer: " + questions[i].a)
+  }
+}
+
+sldeploy("Your total score: " + score + "/" + len(questions))
+</pre>
+<p>Features: ask, loops, conditional scoring, string comparison.</p>
+</div>
+
+<h3>26. Mini Functional Pipeline: Shopping Cart Total</h3>
+<div class="sl-code">
+<pre>
+# shopping_cart.sl
+
+let cart = [
+  { item: "Laptop", price: 1200, qty: 1 },
+  { item: "Mouse", price: 25, qty: 2 },
+  { item: "Keyboard", price: 45, qty: 1 },
+  { item: "Monitor", price: 300, qty: 1 }
+]
+
+let total = cart
+  .map(c => c.price * c.qty)
+  .reduce((acc, v) => acc + v, 0)
+
+sldeploy("Total cart value: $" + total)
+</pre>
+<p>Features: map, reduce, functional programming style.</p>
+</div>
+
+<h3>27. Interactive To-Do Manager</h3>
+<div class="sl-code">
+<pre>
+# todo_manager.sl
+
+let todos = []
+
+while true {
+  let cmd = ask("Command (add/list/complete/exit):").toLowerCase()
+  if cmd == "exit" { break }
+  if cmd == "add" {
+    let task = ask("Task description:")
+    todos = todos + [{ task, done: false }]
+  }
+  if cmd == "list" {
+    sldeploy("To-Do List:")
+    for let i in range(0, len(todos)) {
+      let t = todos[i]
+      sldeploy((i+1) + ". [" + (t.done ? "x" : " ") + "] " + t.task)
+    }
+  }
+  if cmd == "complete" {
+    let idx = num(ask("Enter task number to mark complete:")) - 1
+    if idx >= 0 and idx < len(todos) { todos[idx].done = true }
+  }
+}
+sldeploy("Exiting To-Do Manager.")
+</pre>
+<p>Features: Interactive loop, dynamic arrays, object mutation.</p>
+</div>
+
+<h3>28. Async Random Joke Fetcher</h3>
+<div class="sl-code">
+<pre>
+# jokes_fetch.sl
+
+let count = num(ask("How many jokes do you want?"))
+
+for let i in range(0, count) {
+  let joke = await get("https://official-joke-api.appspot.com/random_joke")
+  sldeploy("Joke " + (i+1) + ": " + joke.setup + " ... " + joke.punchline)
+}
+</pre>
+<p>Features: Async API calls, loops, interactive input, string formatting.</p>
+</div>
+
+<h3>29. Dungeon Exploration Game</h3>
+<div class="sl-code">
+<pre>
+# dungeon_game.sl
+
+let player = { name: ask("Hero name:"), hp: 30, attack: 8 }
+let dungeon = [
+  { name: "Goblin", hp: 12, attack: 4 },
+  { name: "Orc", hp: 20, attack: 6 },
+  { name: "Dragon", hp: 40, attack: 12 }
+]
+
+for let room in dungeon {
+  sldeploy("You encounter a " + room.name + "!")
+  
+  while player.hp > 0 and room.hp > 0 {
+    let action = ask("Attack or heal?").toLowerCase()
+    if action == "attack" {
+      room.hp -= player.attack
+      sldeploy("You hit " + room.name + " -> " + room.hp + " HP left")
+    } else if action == "heal" {
+      player.hp += 5
+      sldeploy("You heal -> " + player.hp + " HP")
+    } else {
+      sldeploy("Invalid action!")
+    }
+
+    if room.hp <= 0 { break }
+
+    player.hp -= room.attack
+    sldeploy(room.name + " hits you -> " + player.hp + " HP left")
+  }
+
+  if player.hp <= 0 { sldeploy("You died! Game over."); break }
+  else { sldeploy("You defeated " + room.name + "!") }
+}
+
+if player.hp > 0 { sldeploy("Congratulations! You cleared the dungeon.") }
+</pre>
+<p>Features: Interactive RPG, loops, branching, dynamic stats.</p>
+</div>
 
   </main>
 </body>
