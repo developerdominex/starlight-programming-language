@@ -13,6 +13,7 @@
 
 <style>
 /* ===================== RESET ===================== */
+/* ===================== RESET ===================== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -36,6 +37,16 @@ html, body {
   --border: #1f2937;
   --code-bg: #1e293b;
   --table-header: #1f2937;
+
+  /* Syntax Colors */
+  --keyword: #7c3aed;       /* purple */
+  --operator: #38bdf8;      /* accent */
+  --number: #22c55e;        /* green */
+  --string: #f472b6;        /* pink */
+  --comment: #64748b;       /* gray */
+  --function: #facc15;      /* yellow */
+  --variable: #38bdf8;      /* blue */
+  --punctuation: #e5e7eb;   /* light text */
 }
 
 /* ===================== BODY ===================== */
@@ -58,9 +69,7 @@ body {
   scrollbar-color: var(--accent) transparent;
 }
 
-#sidebar::-webkit-scrollbar {
-  width: 6px;
-}
+#sidebar::-webkit-scrollbar { width: 6px; }
 #sidebar::-webkit-scrollbar-thumb {
   background-color: var(--accent);
   border-radius: 3px;
@@ -73,10 +82,7 @@ body {
   color: white;
 }
 
-.section {
-  margin-bottom: 30px;
-}
-
+.section { margin-bottom: 30px; }
 .section-title {
   font-size: 12px;
   text-transform: uppercase;
@@ -84,7 +90,6 @@ body {
   margin-bottom: 8px;
   letter-spacing: 0.5px;
 }
-
 .item {
   padding: 8px 12px;
   border-radius: 6px;
@@ -96,17 +101,8 @@ body {
   text-overflow: ellipsis;
   overflow: hidden;
 }
-
-.item:hover {
-  background: var(--hover);
-  color: var(--accent);
-}
-
-.item.active {
-  background: var(--accent);
-  color: #0f172a;
-  font-weight: 600;
-}
+.item:hover { background: var(--hover); color: var(--accent); }
+.item.active { background: var(--accent); color: #0f172a; font-weight: 600; }
 
 /* ===================== CONTENT ===================== */
 #content {
@@ -117,9 +113,7 @@ body {
   scrollbar-color: var(--accent) transparent;
 }
 
-#content::-webkit-scrollbar {
-  width: 6px;
-}
+#content::-webkit-scrollbar { width: 6px; }
 #content::-webkit-scrollbar-thumb {
   background-color: var(--accent);
   border-radius: 3px;
@@ -130,7 +124,6 @@ body {
   margin-bottom: 15px;
   font-weight: 600;
 }
-
 #content h1 { font-size: 32px; }
 #content h2 { font-size: 26px; }
 #content h3 { font-size: 20px; }
@@ -142,15 +135,12 @@ body {
   color: var(--text);
   font-size: 15px;
 }
-
 #content a {
   color: var(--accent);
   text-decoration: none;
   transition: all 0.2s;
 }
-#content a:hover {
-  text-decoration: underline;
-}
+#content a:hover { text-decoration: underline; }
 
 /* ===================== CODE & PRE ===================== */
 #content pre {
@@ -168,14 +158,25 @@ body {
   background: var(--code-bg);
   padding: 2px 6px;
   border-radius: 4px;
-  color: var(--accent);
   font-size: 14px;
+  color: var(--text);
 }
 
-#content pre code {
-  background: transparent;
-  padding: 0;
-}
+/* Inline vs block code */
+#content pre code { background: transparent; padding: 0; display: block; }
+
+/* --------------------- SYNTAX HIGHLIGHTING --------------------- */
+#content pre code .keyword { color: var(--keyword); font-weight: 600; }
+#content pre code .operator { color: var(--operator); font-weight: 600; }
+#content pre code .number { color: var(--number); }
+#content pre code .string { color: var(--string); }
+#content pre code .comment { color: var(--comment); font-style: italic; }
+#content pre code .function { color: var(--function); }
+#content pre code .variable { color: var(--variable); }
+#content pre code .punctuation { color: var(--punctuation); }
+
+/* Optional: highlight inline code operators */
+#content code.operator { color: var(--operator); font-weight: 600; }
 
 /* ===================== BLOCKQUOTES ===================== */
 #content blockquote {
@@ -189,18 +190,9 @@ body {
 }
 
 /* ===================== LISTS ===================== */
-#content ul, #content ol {
-  padding-left: 20px;
-  margin-bottom: 15px;
-}
-
-#content ul li::marker {
-  color: var(--accent);
-}
-
-#content ol li::marker {
-  color: var(--accent);
-}
+#content ul, #content ol { padding-left: 20px; margin-bottom: 15px; }
+#content ul li::marker { color: var(--accent); }
+#content ol li::marker { color: var(--accent); }
 
 /* ===================== TABLES ===================== */
 #content table {
@@ -209,22 +201,17 @@ body {
   margin-bottom: 20px;
   font-size: 14px;
 }
-
 #content th, #content td {
   border: 1px solid var(--border);
   padding: 10px 12px;
   text-align: left;
 }
-
 #content th {
   background: var(--table-header);
   color: white;
   font-weight: 600;
 }
-
-#content tr:nth-child(even) {
-  background: var(--hover);
-}
+#content tr:nth-child(even) { background: var(--hover); }
 
 /* ===================== IMAGES ===================== */
 #content img {
@@ -241,14 +228,12 @@ body {
   background: var(--border);
   margin: 20px 0;
 }
-
 #content details {
   background: var(--hover);
   padding: 10px 15px;
   border-radius: 6px;
   margin: 15px 0;
 }
-
 #content summary {
   cursor: pointer;
   font-weight: 500;
@@ -256,9 +241,7 @@ body {
 }
 
 /* ===================== TRANSITIONS ===================== */
-#sidebar, #content {
-  transition: all 0.3s ease;
-}
+#sidebar, #content { transition: all 0.3s ease; }
 
 </style>
 </head>
