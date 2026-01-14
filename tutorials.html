@@ -273,6 +273,246 @@ Adult users:
 - Mark  
 - Tom
 </div>
+<h3>16.1 Log Analyzer (Real-World CLI Tool)</h3>
+<pre><code>let logs = [
+  "INFO: Server started",
+  "ERROR: Database connection failed",
+  "WARN: Memory usage high",
+  "ERROR: Timeout while querying",
+  "INFO: Request handled",
+  "ERROR: Database connection failed"
+]
+
+let errors = {}
+
+for let line in logs {
+  if not line.startsWith("ERROR") {
+    continue
+  }
+
+  let msg = line.replace("ERROR: ", "")
+
+  if not errors[msg] {
+    errors[msg] = 0
+  }
+
+  errors[msg] += 1
+}
+
+sldeploy("Error summary:")
+for let key in keys(errors) {
+  sldeploy(key + " -> " + errors[key])
+}</code></pre>
+
+<div class="example-output">
+Error summary:<br>
+Database connection failed -> 2<br>
+Timeout while querying -> 1
+</div>
+
+<h3>16.2 Student Grade System</h3>
+<pre><code>let students = [
+  { name: "Ana", grades: [90, 85, 92] },
+  { name: "Mark", grades: [55, 60, 58] },
+  { name: "Lena", grades: [78, 80, 82] }
+]
+
+for let s in students {
+  let sum = 0
+
+  for let g in s.grades {
+    sum += g
+  }
+
+  let avg = sum / len(s.grades)
+
+  if avg < 60 {
+    sldeploy(s.name + " FAILED (" + avg + ")")
+  } else {
+    sldeploy(s.name + " PASSED (" + avg + ")")
+  }
+}</code></pre>
+
+<div class="example-output">
+Ana PASSED (89)<br>
+Mark FAILED (57.666666666666664)<br>
+Lena PASSED (80)
+</div>
+
+<h3>16.3 Expense Tracker (Finance)</h3>
+<pre><code>let expenses = [
+  { category: "Food", amount: 25 },
+  { category: "Transport", amount: 10 },
+  { category: "Food", amount: 15 },
+  { category: "Entertainment", amount: 40 }
+]
+
+let totals = {}
+
+for let e in expenses {
+  if not totals[e.category] {
+    totals[e.category] = 0
+  }
+  totals[e.category] += e.amount
+}
+
+sldeploy("Expense report:")
+for let c in keys(totals) {
+  sldeploy(c + ": $" + totals[c])
+}</code></pre>
+
+<div class="example-output">
+Expense report:<br>
+Food: $40<br>
+Transport: $10<br>
+Entertainment: $40
+</div>
+
+<h3>16.4 Password Strength Checker</h3>
+<pre><code>let passwords = ["hello", "Pa55word", "123456", "Str0ng!Pass"]
+
+for let p in passwords {
+  let score = 0
+
+  if p.len >= 8 { score += 1 }
+  if p.match("[A-Z]") { score += 1 }
+  if p.match("[0-9]") { score += 1 }
+  if p.match("[^a-zA-Z0-9]") { score += 1 }
+
+  sldeploy(p + " -> strength " + score + "/4")
+}</code></pre>
+
+<div class="example-output">
+hello -> strength 1/4<br>
+Pa55word -> strength 4/4<br>
+123456 -> strength 2/4<br>
+Str0ng!Pass -> strength 4/4
+</div>
+
+<h3>16.5 Chat Command Parser</h3>
+<pre><code>let messages = [
+  "/help",
+  "/ban user123",
+  "hello everyone",
+  "/kick troll"
+]
+
+for let msg in messages {
+  if not msg.startsWith("/") {
+    continue
+  }
+
+  let parts = msg.split(" ")
+  let command = parts[0]
+
+  if command == "/help" {
+    sldeploy("Show help menu")
+  }
+
+  if command == "/ban" {
+    sldeploy("Ban user " + parts[1])
+  }
+
+  if command == "/kick" {
+    sldeploy("Kick user " + parts[1])
+  }
+}</code></pre>
+
+<div class="example-output">
+Show help menu<br>
+Ban user user123<br>
+Kick user troll
+</div>
+
+<h3>16.6 Game Logic: Inventory System</h3>
+<pre><code>let inventory = [
+  { name: "Sword", damage: 10 },
+  { name: "Dagger", damage: 4 },
+  { name: "Axe", damage: 12 }
+]
+
+let best = inventory[0]
+
+for let item in inventory {
+  if item.damage > best.damage {
+    best = item
+  }
+}
+
+sldeploy("Best weapon: " + best.name)
+</code></pre>
+
+<div class="example-output">
+Best weapon: Axe
+</div>
+
+<h3>16.7 Mini Data Pipeline</h3>
+<pre><code>let raw = [" 12 ", " 7", "bad", "30", ""]
+
+let cleaned = []
+
+for let x in raw {
+  let v = num(x.trim())
+  if isNaN(v) {
+    continue
+  }
+  cleaned = cleaned + [v]
+}
+
+let total = 0
+for let n in cleaned {
+  total += n
+}
+
+sldeploy("Numbers: " + cleaned)
+sldeploy("Sum: " + total)
+</code></pre>
+
+<div class="example-output">
+Numbers: 12,7,30<br>
+Sum: 49
+</div>
+
+<h3>16.8 Random Quote Generator</h3>
+<pre><code>let quotes = [
+  "Code is poetry.",
+  "Fix the cause, not the symptom.",
+  "Simplicity is power.",
+  "Programs must be read by humans."
+]
+
+let index = random(0, len(quotes))
+sldeploy(quotes[index])
+</code></pre>
+
+<div class="example-output">
+(Code will print one random quote from the array)
+</div>
+
+<h3>16.9 API Data Filter</h3>
+<pre><code>let todos = await get("https://jsonplaceholder.typicode.com/todos")
+
+let completed = []
+
+for let t in todos {
+  if t.completed {
+    completed = completed + [t.title]
+  }
+}
+
+sldeploy("Completed tasks:")
+for let title in completed {
+  sldeploy("- " + title)
+}
+</code></pre>
+
+<div class="example-output">
+Completed tasks:<br>
+- delectus aut autem<br>
+- quis ut nam facilis et officia qui<br>
+- fugiat veniam minus<br>
+...
+</div>
 
   </main>
 </body>
