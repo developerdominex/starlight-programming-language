@@ -513,6 +513,137 @@ Completed tasks:<br>
 - fugiat veniam minus<br>
 ...
 </div>
+<h3>17.1 Advanced: Multi-Level Log Analyzer</h3>
+<pre><code>let logs = [
+  { date: "2026-01-01", message: "ERROR: Database failed" },
+  { date: "2026-01-01", message: "WARN: Memory high" },
+  { date: "2026-01-02", message: "ERROR: Timeout" },
+  { date: "2026-01-02", message: "INFO: Task done" },
+  { date: "2026-01-02", message: "ERROR: Database failed" }
+]
+
+let summary = {}
+
+for let log in logs {
+  let type = log.message.split(":")[0]
+  let day = log.date
+
+  if not summary[day] { summary[day] = {} }
+  if not summary[day][type] { summary[day][type] = 0 }
+
+  summary[day][type] += 1
+}
+
+sldeploy("Daily log summary:")
+for let day in keys(summary) {
+  sldeploy(day + ":")
+  for let t in keys(summary[day]) {
+    sldeploy("  " + t + " -> " + summary[day][t])
+  }
+}</code></pre>
+
+<div class="example-output">
+Daily log summary:<br>
+2026-01-01:<br>
+&nbsp;&nbsp;ERROR -> 1<br>
+&nbsp;&nbsp;WARN -> 1<br>
+2026-01-02:<br>
+&nbsp;&nbsp;ERROR -> 2<br>
+&nbsp;&nbsp;INFO -> 1
+</div>
+
+<h3>17.2 Async: Fetch and Filter API Data</h3>
+<pre><code>let posts = await get("https://jsonplaceholder.typicode.com/posts")
+
+let userPosts = []
+
+for let post in posts {
+  if post.userId == 1 {
+    userPosts = userPosts + [post.title]
+  }
+}
+
+sldeploy("User 1 posts:")
+for let title in userPosts {
+  sldeploy("- " + title)
+}</code></pre>
+
+<div class="example-output">
+User 1 posts:<br>
+- (titles from userId 1)<br>
+- ...
+</div>
+
+<h3>17.3 Functional: Map, Filter, Reduce</h3>
+<pre><code>let items = [
+  { name: "Laptop", price: 1200, discount: 200 },
+  { name: "Mouse", price: 25, discount: 5 },
+  { name: "Keyboard", price: 45, discount: 10 },
+  { name: "Monitor", price: 300, discount: 50 }
+]
+
+let discounted = await filter(items, i => i.price - i.discount > 20)
+
+let total = await reduce(discounted, (acc, i) => acc + (i.price - i.discount), 0)
+
+sldeploy("Total price of items over $20 after discount: $" + total)</code></pre>
+
+<div class="example-output">
+Total price of items over $20 after discount: $1490
+</div>
+
+<h3>17.4 Game Logic: Turn-Based Battle</h3>
+<pre><code>let hero = { name: "Hero", hp: 50, attack: 10 }
+let monster = { name: "Monster", hp: 40, attack: 8 }
+
+while hero.hp > 0 and monster.hp > 0 {
+  monster.hp -= hero.attack
+  sldeploy(hero.name + " attacks " + monster.name + " -> " + monster.hp + " HP left")
+  if monster.hp <= 0 { break }
+
+  hero.hp -= monster.attack
+  sldeploy(monster.name + " attacks " + hero.name + " -> " + hero.hp + " HP left")
+}
+
+if hero.hp > 0 {
+  sldeploy(hero.name + " wins!")
+} else {
+  sldeploy(monster.name + " wins!")
+}</code></pre>
+
+<div class="example-output">
+Hero attacks Monster -> 30 HP left<br>
+Monster attacks Hero -> 42 HP left<br>
+Hero attacks Monster -> 20 HP left<br>
+Monster attacks Hero -> 34 HP left<br>
+...<br>
+Hero wins!
+</div>
+
+<h3>17.5 Data Analysis: Password Strength Stats</h3>
+<pre><code>let passwords = ["hello", "Pa55word", "123456", "Str0ng!Pass", "Weak1"]
+
+let stats = { strong: 0, weak: 0 }
+
+for let p in passwords {
+  let score = 0
+  if p.len >= 8 { score += 1 }
+  if p.match("[A-Z]") { score += 1 }
+  if p.match("[0-9]") { score += 1 }
+  if p.match("[^a-zA-Z0-9]") { score += 1 }
+
+  if score >= 3 { stats.strong += 1 } else { stats.weak += 1 }
+}
+
+sldeploy("Password strength stats:")
+sldeploy("Strong: " + stats.strong)
+sldeploy("Weak: " + stats.weak)</code></pre>
+
+<div class="example-output">
+Password strength stats:<br>
+Strong: 2<br>
+Weak: 3
+</div>
 
   </main>
 </body>
