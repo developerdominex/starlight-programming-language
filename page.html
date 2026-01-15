@@ -112,6 +112,12 @@ iframe {
   right: 14px;
   z-index: 10;
 }
+  .css-selector { color: #d2a8ff; }
+.css-prop { color: #79c0ff; }
+.css-value { color: #a5d6ff; }
+
+.keyword { color: #ff7b72; font-weight: 500; }
+
 </style>
 </head>
 
@@ -166,50 +172,66 @@ console.log("Starlight ready!");
 const textarea = document.getElementById("code");
 const highlight = document.getElementById("highlight");
 
-/* Simple syntax highlighting */
-function highlightCode(code) {
+function escapeHTML(code) {
+  return code.replace(/&/g, "&amp;")
+             .replace(/</g, "&lt;")
+             .replace(/>/g, "&gt;");
+}
+
+function highlightHTML(code) {
   return code
     .replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="comment">$1</span>')
-    .replace(/(&lt;\/?[a-z]+.*?&gt;)/gi, '<span class="tag">$1</span>')
-    .replace(/("[^"]*")/g, '<span class="string">$1</span>')
-    .replace(/\b(function|return|let|var|const|if|else|for|while)\b/g,
+    .replace(/(&lt;\/?[a-z][^&gt;]*&gt;)/gi, match => {
+      return match
+        .replace(/(&lt;\/?)([a-z]+)/i, '$1<span class="tag">$2</span>')
+        .replace(/([a-z-]+)=/gi, '<span class="attr">$1</span>=')
+        .replace(/(".*?")/g, '<span class="string">$1</span>');
+    });
+}
+
+function highlightCSS(code) {
+  return code
+    .replace(/([^{]+){/g, '<span class="css-selector">$1</span>{')
+    .replace(/([a-z-]+)\s*:/g, '<span class="css-prop">$1</span>:')
+    .replace(/:\s*([^;]+);/g, ': <span class="css-value">$1</span>;');
+}
+
+function highlightJS(code) {
+  return code
+    .replace(/(".*?"|'.*?')/g, '<span class="string">$1</span>')
+    .replace(/\b(const|let|var|if|else|for|while|function|return|console)\b/g,
       '<span class="keyword">$1</span>');
 }
 
-function syncHighlight() {
-  let code = textarea.value
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-  highlight.innerHTML = highlightCode(code);
+function highlightCode() {
+  let code = escapeHTML(textarea.value);
+
+  code = code.replace(
+    /(&lt;style&gt;)([\s\S]*?)(&lt;\/style&gt;)/gi,
+    (_, open, css, close) =>
+      open + highlightCSS(css) + close
+  );
+
+  code = code.replace(
+    /(&lt;script&gt;)([\s\S]*?)(&lt;\/script&gt;)/gi,
+    (_, open, js, close) =>
+      open + highlightJS(js) + close
+  );
+
+  code = highlightHTML(code);
+  highlight.innerHTML = code;
 }
 
-textarea.addEventListener("input", syncHighlight);
+textarea.addEventListener("input", highlightCode);
 textarea.addEventListener("scroll", () => {
   highlight.scrollTop = textarea.scrollTop;
 });
 
-/* Auto-pair brackets */
-textarea.addEventListener("keydown", e => {
-  const pairs = { "{": "}", "(": ")", "[": "]", '"': '"', "'": "'" };
-  if (pairs[e.key]) {
-    e.preventDefault();
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    textarea.value =
-      textarea.value.slice(0, start) +
-      e.key + pairs[e.key] +
-      textarea.value.slice(end);
-    textarea.selectionStart = textarea.selectionEnd = start + 1;
-    syncHighlight();
-  }
-});
-
 function runCode() {
-  const iframe = document.getElementById("output");
-  iframe.srcdoc = textarea.value;
+  document.getElementById("output").srcdoc = textarea.value;
 }
 
-syncHighlight();
+highlightCode();
 runCode();
 </script>
 
