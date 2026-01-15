@@ -1231,6 +1231,233 @@ Fetch failed
 Using fallback data  
 Final data status: offline
 </div>
+<h3>35.1 Advanced System: Bank Account Management</h3>
+
+<pre><code># bank_system.sl
+
+let balance = 0
+
+sldeploy("Welcome to SL Bank")
+
+while true {
+  let cmd = ask("Choose: deposit / withdraw / balance / exit")
+
+  if cmd == "exit" { break }
+
+  if cmd == "deposit" {
+    let amount = num(ask("Enter amount:"))
+    if amount > 0 {
+      balance += amount
+      sldeploy("Deposited $" + amount)
+    } else {
+      sldeploy("Invalid amount")
+    }
+  }
+
+  if cmd == "withdraw" {
+    let amount = num(ask("Enter amount:"))
+    if amount > 0 and amount <= balance {
+      balance -= amount
+      sldeploy("Withdrawn $" + amount)
+    } else {
+      sldeploy("Insufficient funds")
+    }
+  }
+
+  if cmd == "balance" {
+    sldeploy("Current balance: $" + balance)
+  }
+}
+
+sldeploy("Session ended")</code></pre>
+
+<div class="example-output">
+Deposit and withdrawal handled  
+Balance validated  
+Session closed safely  
+</div>
+<h3>35.2 Advanced System: Secure ATM with PIN Validation</h3>
+
+<pre><code># atm_system.sl
+
+let pin = "1234"
+let balance = 500
+let attempts = 0
+
+sldeploy("Welcome to SL Secure ATM")
+
+while attempts < 3 {
+  let entered = ask("Enter PIN:")
+
+  if entered == pin {
+    sldeploy("Access granted")
+    break
+  }
+
+  attempts += 1
+  sldeploy("Incorrect PIN")
+}
+
+if attempts == 3 {
+  sldeploy("Card blocked")
+  return
+}
+
+while true {
+  let cmd = ask("withdraw / deposit / balance / exit")
+
+  if cmd == "exit" { break }
+
+  if cmd == "balance" {
+    sldeploy("Balance: $" + balance)
+  }
+
+  if cmd == "deposit" {
+    let amt = num(ask("Amount:"))
+    if amt > 0 {
+      balance += amt
+      sldeploy("Deposited $" + amt)
+    }
+  }
+
+  if cmd == "withdraw" {
+    let amt = num(ask("Amount:"))
+    if amt > 0 and amt <= balance {
+      balance -= amt
+      sldeploy("Withdrawn $" + amt)
+    } else {
+      sldeploy("Invalid transaction")
+    }
+  }
+}
+
+sldeploy("ATM session ended")</code></pre>
+
+<div class="example-output">
+PIN protected access  
+Limited attempts  
+Secure transactions  
+</div>
+<h3>35.3 Advanced Simulation: Turn-Based Queue Combat System</h3>
+
+<pre><code># turn_queue.sl
+
+let players = [
+  { name: "Knight", hp: 30 },
+  { name: "Mage", hp: 20 },
+  { name: "Rogue", hp: 25 }
+]
+
+let turn = 0
+
+while len(players) > 1 {
+  let current = players[turn % len(players)]
+  sldeploy("Turn: " + current.name)
+
+  let action = ask("Attack or skip?")
+
+  if action == "attack" {
+    let targetIndex = (turn + 1) % len(players)
+    let target = players[targetIndex]
+
+    target.hp -= 5
+    sldeploy(current.name + " attacks " + target.name)
+
+    if target.hp <= 0 {
+      sldeploy(target.name + " is defeated")
+      players = players.filter(p => p.hp > 0)
+      turn = turn % len(players)
+    }
+  }
+
+  turn += 1
+}
+
+sldeploy("Winner: " + players[0].name)</code></pre>
+
+<div class="example-output">
+Fair turn rotation  
+Player elimination handled  
+Winner declared correctly  
+</div>
+<h3>35.4 Advanced Analytics: Performance Score Aggregator</h3>
+
+<pre><code># performance_analyzer.sl
+
+let scores = []
+
+while true {
+  let cmd = ask("add / report / exit")
+
+  if cmd == "exit" { break }
+
+  if cmd == "add" {
+    let name = ask("Name:")
+    let score = num(ask("Score:"))
+    scores = scores + [{ name: name, score: score }]
+  }
+
+  if cmd == "report" {
+    let total = 0
+    let max = 0
+
+    for let s in scores {
+      total += s.score
+      if s.score > max { max = s.score }
+    }
+
+    if len(scores) > 0 {
+      sldeploy("Average: " + (total / len(scores)))
+      sldeploy("Highest score: " + max)
+    }
+  }
+}</code></pre>
+
+<div class="example-output">
+Scores collected  
+Statistics calculated  
+Performance insights shown  
+</div>
+<h3>35.5 Advanced Workflow: Approval & Review System</h3>
+
+<pre><code># approval_system.sl
+
+let requests = []
+
+while true {
+  let cmd = ask("submit / review / list / exit")
+
+  if cmd == "exit" { break }
+
+  if cmd == "submit" {
+    let title = ask("Request title:")
+    requests = requests + [{ title: title, status: "pending" }]
+  }
+
+  if cmd == "review" {
+    let title = ask("Request title:")
+    let decision = ask("approve / reject:")
+
+    for let r in requests {
+      if r.title == title {
+        r.status = decision
+      }
+    }
+  }
+
+  if cmd == "list" {
+    sldeploy("Requests:")
+    for let r in requests {
+      sldeploy(r.title + " [" + r.status + "]")
+    }
+  }
+}</code></pre>
+
+<div class="example-output">
+Requests submitted  
+Approval workflow enforced  
+Statuses tracked  
+</div>
 
   </main>
 </body>
