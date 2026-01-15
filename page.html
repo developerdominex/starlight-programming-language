@@ -1,197 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Starlight Page Test</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Starlight PageTest</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Starlight PageTest — write HTML, CSS and JavaScript and preview instantly.">
+<meta name="keywords" content="Starlight Programming Language, HTML editor, CSS, JavaScript, CLI, playground">
 
-  <!-- Font Awesome -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
 
-  <!-- CodeMirror 6 -->
-  <script type="module">
-    import { EditorState } from "https://cdn.jsdelivr.net/npm/@codemirror/state@6.4.0/dist/index.js";
-    import { EditorView, keymap, lineNumbers } from "https://cdn.jsdelivr.net/npm/@codemirror/view@6.15.0/dist/index.js";
-    import { defaultKeymap } from "https://cdn.jsdelivr.net/npm/@codemirror/commands@6.3.3/dist/index.js";
-    import { html } from "https://cdn.jsdelivr.net/npm/@codemirror/lang-html@6.4.9/dist/index.js";
-    import { javascript } from "https://cdn.jsdelivr.net/npm/@codemirror/lang-javascript@6.2.2/dist/index.js";
-    import { css } from "https://cdn.jsdelivr.net/npm/@codemirror/lang-css@6.3.1/dist/index.js";
-    import { oneDark } from "https://cdn.jsdelivr.net/npm/@codemirror/theme-one-dark@6.2.0/dist/index.js";
-    import { autocompletion } from "https://cdn.jsdelivr.net/npm/@codemirror/autocomplete@6.10.2/dist/index.js";
-    import { closeBrackets } from "https://cdn.jsdelivr.net/npm/@codemirror/autocomplete@6.10.2/dist/index.js";
+body {
+  margin: 0;
+  background: #0f111a;
+  color: #e6e6e6;
+  font-family: Consolas, Monaco, monospace;
+  height: 100vh;
+  display: flex;
+}
 
-    window.initEditor = function () {
-      const startCode = `
+#editor-panel {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  background: #151823;
+}
+
+#editor-header {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1b1f2f;
+  border-bottom: 1px solid #222;
+}
+
+#run-btn {
+  background: #61dafb;
+  color: #000;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#run-btn:hover {
+  background: #4cc2e6;
+}
+
+#editor {
+  position: relative;
+  flex: 1;
+}
+
+#highlight {
+  position: absolute;
+  inset: 0;
+  padding: 12px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  pointer-events: none;
+  color: transparent;
+}
+
+#highlight span.html { color: #e06c75; }
+#highlight span.css { color: #61afef; }
+#highlight span.js { color: #c678dd; }
+#highlight span.comment { color: #5c6370; }
+
+textarea {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  color: #e6e6e6;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  caret-color: #61dafb;
+}
+
+#preview-panel {
+  width: 50%;
+  background: #fff;
+  position: relative;
+}
+
+#logo {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  height: 32px;
+  z-index: 10;
+}
+
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Scrollbars */
+textarea::-webkit-scrollbar,
+#highlight::-webkit-scrollbar {
+  width: 8px;
+}
+textarea::-webkit-scrollbar-thumb {
+  background: #333;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LEFT -->
+<div id="editor-panel">
+  <div id="editor-header">
+    <strong>Starlight PageTest</strong>
+
+    <button id="run-btn">
+      <!-- Play icon (FontAwesome-style SVG) -->
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M8 5v14l11-7z"></path>
+      </svg>
+      Run
+    </button>
+  </div>
+
+  <div id="editor">
+    <pre id="highlight"></pre>
+    <textarea id="code" spellcheck="false">
 <!DOCTYPE html>
 <html>
 <head>
-  <style>
-    body {
-      background: #111;
-      color: #61dafb;
-      font-family: Arial;
-      text-align: center;
-    }
-  </style>
+<style>
+body {
+  background: #111;
+  color: white;
+}
+</style>
 </head>
 <body>
+<h1>Hello Starlight</h1>
 
-  <h1>Hello Starlight</h1>
-  <button onclick="sayHi()">Click me</button>
-
-  <script>
-    function sayHi() {
-      alert("Welcome to Starlight Page Test!");
-    }
-  </script>
-
+<script>
+console.log("Ready");
+</script>
 </body>
 </html>
-      `.trim();
-
-      const state = EditorState.create({
-        doc: startCode,
-        extensions: [
-          lineNumbers(),
-          keymap.of(defaultKeymap),
-          html(),
-          javascript(),
-          css(),
-          autocompletion(),
-          closeBrackets(),
-          oneDark
-        ]
-      });
-
-      window.editor = new EditorView({
-        state,
-        parent: document.getElementById("editor")
-      });
-    };
-  </script>
-
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      background: #0f0f0f;
-      font-family: "Segoe UI", Tahoma, sans-serif;
-      color: #e0e0e0;
-      display: flex;
-      flex-direction: column;
-    }
-
-    header {
-      height: 50px;
-      background: #1b1b1b;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      border-bottom: 1px solid #2a2a2a;
-    }
-
-    header h2 {
-      font-size: 16px;
-      color: #61dafb;
-      margin: 0;
-    }
-
-    header img {
-      height: 30px;
-    }
-
-    .container {
-      flex: 1;
-      display: flex;
-    }
-
-    .editor-panel {
-      width: 50%;
-      background: #151515;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .editor-toolbar {
-      padding: 8px;
-      background: #1e1e1e;
-      border-bottom: 1px solid #2a2a2a;
-    }
-
-    .editor-toolbar button {
-      background: #61dafb;
-      color: #000;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    #editor {
-      flex: 1;
-    }
-
-    .preview-panel {
-      width: 50%;
-      background: #fff;
-      position: relative;
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    .preview-title {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      background: rgba(0,0,0,0.7);
-      color: #fff;
-      padding: 4px 8px;
-      font-size: 12px;
-      border-radius: 4px;
-      z-index: 10;
-    }
-  </style>
-</head>
-
-<body onload="initEditor()">
-
-<header>
-  <h2><i class="fa-solid fa-code"></i> Starlight Page Test</h2>
-  <img src="https://dominexmacedon.github.io/starlight-programming-language/logo/starlight-lang-logo.png" alt="Starlight Logo">
-</header>
-
-<div class="container">
-
-  <div class="editor-panel">
-    <div class="editor-toolbar">
-      <button onclick="runCode()">
-        <i class="fa-solid fa-play"></i> Run
-      </button>
-    </div>
-    <div id="editor"></div>
+    </textarea>
   </div>
+</div>
 
-  <div class="preview-panel">
-    <div class="preview-title">
-      <i class="fa-solid fa-eye"></i> Output
-    </div>
-    <iframe id="preview"></iframe>
-  </div>
-
+<!-- RIGHT -->
+<div id="preview-panel">
+  <img id="logo" src="https://dominexmacedon.github.io/starlight-programming-language/logo/starlight-lang-logo.png">
+  <iframe id="preview"></iframe>
 </div>
 
 <script>
-  function runCode() {
-    const code = window.editor.state.doc.toString();
-    const iframe = document.getElementById("preview");
-    iframe.srcdoc = code;
+const code = document.getElementById("code");
+const highlight = document.getElementById("highlight");
+const preview = document.getElementById("preview");
+const runBtn = document.getElementById("run-btn");
+
+/* ---------- Syntax Highlight ---------- */
+function escapeHTML(str) {
+  return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function highlightCode() {
+  let text = escapeHTML(code.value);
+
+  text = text.replace(/(&lt;!--[\s\S]*?--&gt;)/g,'<span class="comment">$1</span>');
+  text = text.replace(/(&lt;[^&]*&gt;)/g,'<span class="html">$1</span>');
+  text = text.replace(/(\{[\s\S]*?\})/g,'<span class="css">$1</span>');
+  text = text.replace(/(function|let|const|var|if|else|for|while|return)/g,'<span class="js">$1</span>');
+
+  highlight.innerHTML = text;
+}
+
+code.addEventListener("input", highlightCode);
+code.addEventListener("scroll", () => {
+  highlight.scrollTop = code.scrollTop;
+  highlight.scrollLeft = code.scrollLeft;
+});
+
+/* ---------- Auto Close Brackets ---------- */
+const pairs = {
+  "{": "}",
+  "(": ")",
+  "[": "]",
+  "\"": "\"",
+  "'": "'"
+};
+
+code.addEventListener("keydown", e => {
+  if (pairs[e.key]) {
+    e.preventDefault();
+    const start = code.selectionStart;
+    const end = code.selectionEnd;
+    const close = pairs[e.key];
+
+    code.value =
+      code.value.substring(0, start) +
+      e.key + close +
+      code.value.substring(end);
+
+    code.selectionStart = code.selectionEnd = start + 1;
+    highlightCode();
   }
+});
+
+/* ---------- Run Code ---------- */
+runBtn.onclick = () => {
+  preview.srcdoc = code.value;
+};
+
+highlightCode();
+preview.srcdoc = code.value;
 </script>
 
 </body>
