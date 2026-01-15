@@ -1576,7 +1576,7 @@ if score >= 4 {
 </pre>
 </div>
 
-<h3>39. Multiplayer Economy Simulator 💰</h3>
+<h3>39. Multiplayer Economy Simulator </h3>
 <div>
 <pre>
 # economy_simulator.sl
@@ -1620,7 +1620,7 @@ for let u in users {
 </pre>
 </div>
 
-<h3>41. Strategy Game: Resource Gathering 🌲</h3>
+<h3>41. Strategy Game: Resource Gathering </h3>
 <div>
 <pre>
 # resource_game.sl
@@ -1640,7 +1640,7 @@ for let day in range(1, 6) {
 </pre>
 </div>
 
-<h3>42. Fraud Detection Rules Engine 🕵️</h3>
+<h3>42. Fraud Detection Rules Engine </h3>
 <div>
 <pre>
 # fraud_detection.sl
@@ -1661,7 +1661,7 @@ for let t in transactions {
 </pre>
 </div>
 
-<h3>43. Chatbot Command Router 🤖</h3>
+<h3>43. Chatbot Command Router </h3>
 <div>
 <pre>
 # chatbot.sl
@@ -1683,7 +1683,7 @@ while true {
 </pre>
 </div>
 
-<h3>44. Tournament Ranking System 🏆</h3>
+<h3>44. Tournament Ranking System </h3>
 <div>
 <pre>
 # tournament.sl
@@ -1707,7 +1707,7 @@ sldeploy("Winner: " + winner.name)
 </pre>
 </div>
 
-<h3>45. System Health Monitor 📊</h3>
+<h3>45. System Health Monitor </h3>
 <div>
 <pre>
 # health_monitor.sl
@@ -1724,6 +1724,190 @@ for let usage in cpu {
   }
 }
 </pre>
+</div>
+<h3>46. ATM Simulator</h3>
+<div>
+  <strong>Description:</strong> Simulates a secure ATM allowing PIN verification, deposits, withdrawals, and balance checking. Includes attempt limits for security.<br>
+  <strong>Keywords:</strong> ATM, PIN verification, transactions, balance, user input.<br>
+  <pre>
+let pin = "1234"
+let balance = 500
+let attempts = 0
+
+sldeploy("Welcome to SL Secure ATM")
+
+# PIN verification
+while attempts &lt; 3 {
+  let entered = ask("Enter your PIN:")
+  if entered == pin { sldeploy("Access granted"); break }
+  attempts += 1
+  sldeploy("Incorrect PIN")
+}
+
+if attempts == 3 { sldeploy("Card blocked") }
+else {
+  while true {
+    let cmd = ask("Choose: withdraw / deposit / balance / exit")
+    
+    if cmd == "exit" { break }
+
+    if cmd == "balance" { sldeploy("Balance: $" + balance) }
+
+    if cmd == "deposit" {
+      let amt = num(ask("Amount to deposit:"))
+      if amt &gt; 0 { balance += amt; sldeploy("Deposited $" + amt) }
+      else { sldeploy("Invalid amount") }
+    }
+
+    if cmd == "withdraw" {
+      let amt = num(ask("Amount to withdraw:"))
+      if amt &gt; 0 and amt &lt;= balance { balance -= amt; sldeploy("Withdrawn $" + amt) }
+      else { sldeploy("Invalid or insufficient funds") }
+    }
+  }
+}
+
+sldeploy("Thank you for using SL ATM")
+  </pre>
+</div>
+
+<h3>47. Budget & Expense Tracker</h3>
+<div>
+  <strong>Description:</strong> Tracks expenses by category, computes totals, and alerts if budget is exceeded. Interactive input for real-time tracking.<br>
+  <strong>Keywords:</strong> budgeting, expenses, categories, totals, alerts.<br>
+  <pre>
+let expenses = []
+
+sldeploy("Welcome to Budget Tracker")
+
+while true {
+  let cmd = ask("Choose: add / summary / exit")
+
+  if cmd == "exit" { break }
+
+  if cmd == "add" {
+    let title = ask("Expense name:")
+    let category = ask("Category (food, rent, bills, misc):")
+    let amount = num(ask("Amount:"))
+    expenses = expenses + [{ title: title, category: category, amount: amount }]
+    sldeploy("Expense added")
+  }
+
+  if cmd == "summary" {
+    let total = 0
+    let categories = {}
+    for let e in expenses {
+      total += e.amount
+      if not categories[e.category] { categories[e.category] = 0 }
+      categories[e.category] += e.amount
+    }
+
+    sldeploy("Total expenses: $" + total)
+    sldeploy("Category breakdown:")
+    for let cat in keys(categories) { sldeploy(cat + " -> $" + categories[cat]) }
+
+    if total &gt; 1000 { sldeploy("Alert: You exceeded your budget!") }
+  }
+}
+  </pre>
+</div>
+
+<h3>48. Bank Fraud Detection</h3>
+<div>
+  <strong>Description:</strong> Checks transactions against a threshold and flags suspicious activity. Useful for monitoring large transfers.<br>
+  <strong>Keywords:</strong> fraud detection, transactions, threshold, alerts.<br>
+  <pre>
+let transactions = [
+  { user: "Ana", amount: 50 },
+  { user: "Ana", amount: 5000 },
+  { user: "Mark", amount: 20 },
+  { user: "Lena", amount: 15000 }
+]
+
+let threshold = 1000
+
+sldeploy("Checking transactions for fraud...")
+
+for let t in transactions {
+  if t.amount &gt; threshold {
+    sldeploy("ALERT: Suspicious transaction by " + t.user + " -> $" + t.amount)
+  } else {
+    sldeploy("Transaction OK: " + t.user + " -> $" + t.amount)
+  }
+}
+  </pre>
+</div>
+
+<h3>49. Loan Eligibility Checker</h3>
+<div>
+  <strong>Description:</strong> Evaluates applicants' debt-to-income ratio to determine loan eligibility.<br>
+  <strong>Keywords:</strong> loans, eligibility, debt-to-income, financial assessment.<br>
+  <pre>
+let applicants = [
+  { name: "John", income: 4000, debt: 1000 },
+  { name: "Alice", income: 2000, debt: 2500 },
+  { name: "Mark", income: 5000, debt: 1000 }
+]
+
+sldeploy("Loan Eligibility Report:")
+
+for let a in applicants {
+  let ratio = a.debt / a.income
+  if ratio &lt; 0.3 {
+    sldeploy(a.name + " is eligible for loan")
+  } else {
+    sldeploy(a.name + " is NOT eligible for loan")
+  }
+}
+  </pre>
+</div>
+
+<h3>50. Savings Goal Tracker</h3>
+<div>
+  <strong>Description:</strong> Tracks progress toward multiple savings goals and indicates when a goal is reached.<br>
+  <strong>Keywords:</strong> savings, goals, progress tracking, personal finance.<br>
+  <pre>
+let goals = [
+  { name: "Vacation", target: 2000, saved: 500 },
+  { name: "Laptop", target: 1500, saved: 1500 },
+  { name: "Emergency Fund", target: 5000, saved: 3000 }
+]
+
+sldeploy("Savings Goals Status:")
+
+for let g in goals {
+  let remaining = g.target - g.saved
+  if remaining &lt;= 0 {
+    sldeploy(g.name + " -> Goal reached! ✅")
+  } else {
+    sldeploy(g.name + " -> $" + remaining + " remaining")
+  }
+}
+  </pre>
+</div>
+
+<h3>51. Investment Portfolio Analyzer</h3>
+<div>
+  <strong>Description:</strong> Calculates total portfolio value, showing each stock’s individual value and overall sum.<br>
+  <strong>Keywords:</strong> investments, stocks, portfolio, value calculation, finance analysis.<br>
+  <pre>
+let portfolio = [
+  { stock: "AAPL", qty: 10, price: 150 },
+  { stock: "TSLA", qty: 5, price: 700 },
+  { stock: "AMZN", qty: 2, price: 3300 }
+]
+
+sldeploy("Portfolio Summary:")
+
+let total = 0
+for let p in portfolio {
+  let value = p.qty * p.price
+  sldeploy(p.stock + " -> " + p.qty + " shares x $" + p.price + " = $" + value)
+  total += value
+}
+
+sldeploy("Total portfolio value: $" + total)
+  </pre>
 </div>
 
   </main>
