@@ -1458,6 +1458,251 @@ Requests submitted
 Approval workflow enforced  
 Statuses tracked  
 </div>
+<h3>36. Smart Recommendation Engine (Rules + Scoring)</h3>
+<div>
+<pre>
+# recommendation_engine.sl
+
+let users = [
+  { name: "Ana", interests: ["music", "art"] },
+  { name: "Mark", interests: ["sports", "fitness"] },
+  { name: "Lena", interests: ["music", "sports"] }
+]
+
+let content = [
+  { title: "Rock Concert", tag: "music" },
+  { title: "Art Exhibition", tag: "art" },
+  { title: "Football Match", tag: "sports" },
+  { title: "Gym Training", tag: "fitness" }
+]
+
+for let u in users {
+  sldeploy("Recommendations for " + u.name + ":")
+  for let c in content {
+    for let i in u.interests {
+      if c.tag == i {
+        sldeploy("- " + c.title)
+      }
+    }
+  }
+}
+</pre>
+</div>
+
+<h3>37. Real-World Scheduler (Conflict Detection)</h3>
+<div>
+<pre>
+# scheduler.sl
+
+let events = []
+
+while true {
+  let cmd = ask("add / list / exit")
+
+  if cmd == "exit" { break }
+
+  if cmd == "add" {
+    let name = ask("Event name:")
+    let time = ask("Time (e.g. 10:00):")
+
+    let conflict = false
+    for let e in events {
+      if e.time == time { conflict = true }
+    }
+
+    if conflict {
+      sldeploy("Time conflict detected!")
+    } else {
+      events = events + [{ name: name, time: time }]
+      sldeploy("Event scheduled")
+    }
+  }
+
+  if cmd == "list" {
+    sldeploy("Schedule:")
+    for let e in events {
+      sldeploy(e.time + " -> " + e.name)
+    }
+  }
+}
+</pre>
+</div>
+
+<h3>38. AI-Style Decision Tree (Advanced Logic)</h3>
+<div>
+<pre>
+# decision_tree.sl
+
+let score = 0
+
+let q1 = ask("Do you like coding? (yes/no)")
+if q1 == "yes" { score += 2 }
+
+let q2 = ask("Do you enjoy problem solving? (yes/no)")
+if q2 == "yes" { score += 2 }
+
+let q3 = ask("Do you like math? (yes/no)")
+if q3 == "yes" { score += 1 }
+
+if score >= 4 {
+  sldeploy("You should be a Software Engineer")
+} else if score >= 2 {
+  sldeploy("You should explore Tech roles")
+} else {
+  sldeploy("Creative fields may suit you")
+}
+</pre>
+</div>
+
+<h3>39. Multiplayer Economy Simulator 💰</h3>
+<div>
+<pre>
+# economy_simulator.sl
+
+let players = [
+  { name: "Alice", money: 100 },
+  { name: "Bob", money: 100 }
+]
+
+for let round in range(1, 6) {
+  sldeploy("Round " + round)
+  for let p in players {
+    let income = 10
+    let expense = 5
+    p.money += income - expense
+    sldeploy(p.name + " balance: $" + p.money)
+  }
+}
+</pre>
+</div>
+
+<h3>40. Access Control System (Roles & Permissions)</h3>
+<div>
+<pre>
+# access_control.sl
+
+let users = [
+  { name: "Admin", role: "admin" },
+  { name: "Guest", role: "guest" }
+]
+
+for let u in users {
+  sldeploy("User: " + u.name)
+  if u.role == "admin" {
+    sldeploy("Access: read, write, delete")
+  }
+  if u.role == "guest" {
+    sldeploy("Access: read only")
+  }
+}
+</pre>
+</div>
+
+<h3>41. Strategy Game: Resource Gathering 🌲</h3>
+<div>
+<pre>
+# resource_game.sl
+
+let resources = { wood: 0, stone: 0 }
+
+for let day in range(1, 6) {
+  resources.wood += 3
+  resources.stone += 2
+
+  sldeploy(
+    "Day " + day +
+    " | Wood: " + resources.wood +
+    " | Stone: " + resources.stone
+  )
+}
+</pre>
+</div>
+
+<h3>42. Fraud Detection Rules Engine 🕵️</h3>
+<div>
+<pre>
+# fraud_detection.sl
+
+let transactions = [
+  { user: "Ana", amount: 50 },
+  { user: "Ana", amount: 5000 },
+  { user: "Mark", amount: 20 }
+]
+
+for let t in transactions {
+  if t.amount > 1000 {
+    sldeploy("ALERT: Suspicious transaction by " + t.user)
+  } else {
+    sldeploy("Transaction OK: " + t.user)
+  }
+}
+</pre>
+</div>
+
+<h3>43. Chatbot Command Router 🤖</h3>
+<div>
+<pre>
+# chatbot.sl
+
+while true {
+  let msg = ask("Say something (exit to quit):")
+  if msg == "exit" { break }
+
+  if msg == "help" {
+    sldeploy("Commands: help, time, joke")
+  }
+  if msg == "time" {
+    sldeploy("Time feature coming soon")
+  }
+  if msg == "joke" {
+    sldeploy("Why do programmers love dark mode?")
+  }
+}
+</pre>
+</div>
+
+<h3>44. Tournament Ranking System 🏆</h3>
+<div>
+<pre>
+# tournament.sl
+
+let players = [
+  { name: "A", score: 0 },
+  { name: "B", score: 0 }
+]
+
+players[0].score += 3
+players[1].score += 1
+
+let winner = players[0]
+for let p in players {
+  if p.score > winner.score {
+    winner = p
+  }
+}
+
+sldeploy("Winner: " + winner.name)
+</pre>
+</div>
+
+<h3>45. System Health Monitor 📊</h3>
+<div>
+<pre>
+# health_monitor.sl
+
+let cpu = [40, 55, 80, 95]
+
+for let usage in cpu {
+  if usage > 90 {
+    sldeploy("CRITICAL CPU usage: " + usage + "%")
+  } else if usage > 70 {
+    sldeploy("Warning CPU usage: " + usage + "%")
+  } else {
+    sldeploy("CPU OK: " + usage + "%")
+  }
+}
+</pre>
+</div>
 
   </main>
 </body>
