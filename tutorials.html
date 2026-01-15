@@ -1878,7 +1878,7 @@ sldeploy("Savings Goals Status:")
 for let g in goals {
   let remaining = g.target - g.saved
   if remaining &lt;= 0 {
-    sldeploy(g.name + " -> Goal reached! ✅")
+    sldeploy(g.name + " -> Goal reached!")
   } else {
     sldeploy(g.name + " -> $" + remaining + " remaining")
   }
