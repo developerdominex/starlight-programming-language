@@ -9,16 +9,19 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
 <style>
-body {
+html, body {
   margin: 0;
+  height: 100%;
+  background: #0d1117;
   font-family: Consolas, monospace;
-  background: #0f1117;
-  color: #e6edf3;
-  height: 100vh;
-  display: flex;
 }
 
-/* Layout */
+.container {
+  display: flex;
+  height: 100%;
+}
+
+/* Editor */
 .editor {
   width: 50%;
   display: flex;
@@ -26,116 +29,94 @@ body {
   background: #0d1117;
 }
 
-.preview {
-  width: 50%;
-  background: #ffffff;
-  position: relative;
-}
-
-/* Header */
 .topbar {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding: 10px 14px;
   background: #161b22;
   border-bottom: 1px solid #30363d;
+  color: #c9d1d9;
 }
 
 .run-btn {
   background: #238636;
-  color: white;
+  color: #fff;
   border: none;
-  padding: 8px 14px;
+  padding: 7px 14px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
 }
 
 .run-btn:hover {
   background: #2ea043;
 }
 
-.logo {
-  height: 28px;
-}
-
-/* Editor */
-.code-container {
-  position: relative;
+#editor {
   flex: 1;
-  overflow: hidden;
 }
-
-.highlight {
-  position: absolute;
-  inset: 0;
-  padding: 14px;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  pointer-events: none;
-  color: transparent;
-}
-
-textarea {
-  position: absolute;
-  inset: 0;
-  background: transparent;
-  color: #e6edf3;
-  border: none;
-  resize: none;
-  padding: 14px;
-  outline: none;
-  font-size: 14px;
-  line-height: 1.5;
-  caret-color: #58a6ff;
-}
-
-/* Syntax colors */
-.tag { color: #7ee787; }
-.attr { color: #79c0ff; }
-.string { color: #a5d6ff; }
-.comment { color: #8b949e; }
-.keyword { color: #ff7b72; }
 
 /* Preview */
-iframe {
-  border: none;
-  width: 100%;
-  height: 100%;
+.preview {
+  width: 50%;
+  position: relative;
+  background: #fff;
 }
 
-/* Preview top */
-.preview-top {
+.preview iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.logo {
   position: absolute;
   top: 10px;
   right: 14px;
+  height: 28px;
   z-index: 10;
 }
-  .css-selector { color: #d2a8ff; }
-.css-prop { color: #79c0ff; }
-.css-value { color: #a5d6ff; }
-
-.keyword { color: #ff7b72; font-weight: 500; }
-
 </style>
 </head>
 
 <body>
 
-<!-- Editor -->
-<div class="editor">
-  <div class="topbar">
-    <div><i class="fa-solid fa-code"></i> Starlight PageTest</div>
-    <button class="run-btn" onclick="runCode()">
-      <i class="fa-solid fa-play"></i> Run
-    </button>
+<div class="container">
+
+  <!-- Editor -->
+  <div class="editor">
+    <div class="topbar">
+      <div><i class="fa-solid fa-code"></i> Starlight PageTest</div>
+      <button class="run-btn" onclick="runCode()">
+        <i class="fa-solid fa-play"></i> Run
+      </button>
+    </div>
+    <div id="editor"></div>
   </div>
 
-  <div class="code-container">
-    <pre class="highlight" id="highlight"></pre>
-    <textarea id="code" spellcheck="false">
-<!DOCTYPE html>
+  <!-- Preview -->
+  <div class="preview">
+    <img class="logo" src="https://dominexmacedon.github.io/starlight-programming-language/logo/starlight-lang-logo.png">
+    <iframe id="output"></iframe>
+  </div>
+
+</div>
+
+<!-- Monaco Loader -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+
+<script>
+require.config({
+  paths: {
+    vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs"
+  }
+});
+
+require(["vs/editor/editor.main"], function () {
+
+  window.editor = monaco.editor.create(document.getElementById("editor"), {
+    value:
+`<!DOCTYPE html>
 <html>
 <head>
 <style>
@@ -155,84 +136,21 @@ h1 { color: purple; }
 console.log("Starlight ready!");
 </script>
 </body>
-</html>
-    </textarea>
-  </div>
-</div>
+</html>`,
+    language: "html",
+    theme: "vs-dark",
+    fontSize: 14,
+    automaticLayout: true,
+    minimap: { enabled: false }
+  });
 
-<!-- Preview -->
-<div class="preview">
-  <div class="preview-top">
-    <img class="logo" src="https://dominexmacedon.github.io/starlight-programming-language/logo/starlight-lang-logo.png">
-  </div>
-  <iframe id="output"></iframe>
-</div>
-
-<script>
-const textarea = document.getElementById("code");
-const highlight = document.getElementById("highlight");
-
-function escapeHTML(code) {
-  return code.replace(/&/g, "&amp;")
-             .replace(/</g, "&lt;")
-             .replace(/>/g, "&gt;");
-}
-
-function highlightHTML(code) {
-  return code
-    .replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="comment">$1</span>')
-    .replace(/(&lt;\/?[a-z][^&gt;]*&gt;)/gi, match => {
-      return match
-        .replace(/(&lt;\/?)([a-z]+)/i, '$1<span class="tag">$2</span>')
-        .replace(/([a-z-]+)=/gi, '<span class="attr">$1</span>=')
-        .replace(/(".*?")/g, '<span class="string">$1</span>');
-    });
-}
-
-function highlightCSS(code) {
-  return code
-    .replace(/([^{]+){/g, '<span class="css-selector">$1</span>{')
-    .replace(/([a-z-]+)\s*:/g, '<span class="css-prop">$1</span>:')
-    .replace(/:\s*([^;]+);/g, ': <span class="css-value">$1</span>;');
-}
-
-function highlightJS(code) {
-  return code
-    .replace(/(".*?"|'.*?')/g, '<span class="string">$1</span>')
-    .replace(/\b(const|let|var|if|else|for|while|function|return|console)\b/g,
-      '<span class="keyword">$1</span>');
-}
-
-function highlightCode() {
-  let code = escapeHTML(textarea.value);
-
-  code = code.replace(
-    /(&lt;style&gt;)([\s\S]*?)(&lt;\/style&gt;)/gi,
-    (_, open, css, close) =>
-      open + highlightCSS(css) + close
-  );
-
-  code = code.replace(
-    /(&lt;script&gt;)([\s\S]*?)(&lt;\/script&gt;)/gi,
-    (_, open, js, close) =>
-      open + highlightJS(js) + close
-  );
-
-  code = highlightHTML(code);
-  highlight.innerHTML = code;
-}
-
-textarea.addEventListener("input", highlightCode);
-textarea.addEventListener("scroll", () => {
-  highlight.scrollTop = textarea.scrollTop;
+  runCode();
 });
 
 function runCode() {
-  document.getElementById("output").srcdoc = textarea.value;
+  const iframe = document.getElementById("output");
+  iframe.srcdoc = window.editor.getValue();
 }
-
-highlightCode();
-runCode();
 </script>
 
 </body>
