@@ -1,169 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Starlight PageTest</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Starlight Language Online Page Test - Edit HTML, CSS, JS with live preview.">
+  <meta name="keywords" content="Starlight, Starlight Language, CLI, HTML, CSS, JavaScript, Code Editor, Live Preview">
+  <title>Starlight Page Test</title>
 
-<style>
-* { box-sizing: border-box; }
+  <!-- Logo favicon -->
+  <link rel="icon" href="https://dominexmacedon.github.io/starlight-programming-language/logo/starlight-lang-logo.png">
 
-body {
-  margin: 0;
-  height: 100vh;
-  display: flex;
-  font-family: Consolas, Monaco, monospace;
-  background: #0f111a;
-  color: #e6e6e6;
-}
+  <!-- CodeMirror -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/dracula.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/edit/closebrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/edit/matchbrackets.min.js"></script>
 
-#editor-panel {
-  width: 50%;
-  display: flex;
-  flex-direction: column;
-  background: #151823;
-}
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #1e1e1e;
+      color: #e0e0e0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-#editor-header {
-  padding: 10px;
-  background: #1b1f2f;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+    header {
+      background-color: #282c34;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-#run-btn {
-  background: #61dafb;
-  border: none;
-  padding: 6px 14px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-}
+    header h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: #61dafb;
+    }
 
-#editor {
-  flex: 1;
-  padding: 12px;
-  outline: none;
-  white-space: pre;
-  overflow: auto;
-  caret-color: #61dafb;
-}
+    header img {
+      height: 40px;
+    }
 
-/* Syntax colors */
-.tag { color: #e06c75; }
-.css { color: #61afef; }
-.js { color: #c678dd; }
-.comment { color: #5c6370; }
+    main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
 
-#preview-panel {
-  width: 50%;
-  position: relative;
-  background: white;
-}
+    #editor-container {
+      width: 50%;
+      height: 100%;
+    }
 
-#logo {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  height: 32px;
-  z-index: 5;
-}
+    #editor {
+      height: 100%;
+    }
 
-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-</style>
+    #output-container {
+      width: 50%;
+      height: 100%;
+      background-color: #ffffff;
+      color: #000000;
+      overflow: auto;
+      border-left: 2px solid #61dafb;
+      position: relative;
+    }
+
+    #run-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      padding: 0.3rem 0.6rem;
+      background-color: #61dafb;
+      color: #1e1e1e;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
 </head>
-
 <body>
+  <header>
+    <h1>Starlight Page Test</h1>
+    <img src="https://dominexmacedon.github.io/starlight-programming-language/logo/starlight-lang-logo.png" alt="Starlight Logo">
+  </header>
 
-<!-- EDITOR -->
-<div id="editor-panel">
-  <div id="editor-header">
-    <strong>Starlight Editor</strong>
-    <button id="run-btn">▶ Run</button>
-  </div>
+  <main>
+    <div id="editor-container">
+      <textarea id="editor"><!DOCTYPE html>
+<html>
+  <head>
+    <title>Preview</title>
+    <style>
+      body { font-family: sans-serif; background: #f0f0f0; padding: 2rem; }
+      h1 { color: #61dafb; }
+    </style>
+  </head>
+  <body>
+    <h1>Hello Starlight!</h1>
+    <p>Edit HTML, CSS, and JS here.</p>
+    <script>
+      console.log("JS works!");
+    </script>
+  </body>
+</html></textarea>
+    </div>
 
-  <div id="editor" contenteditable="true">
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;style&gt;
-body {
-  background: #111;
-  color: white;
-}
-&lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-&lt;h1&gt;Hello Starlight&lt;/h1&gt;
-&lt;script&gt;
-console.log("Ready");
-&lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-  </div>
-</div>
+    <div id="output-container">
+      <button id="run-btn"><i class="fas fa-play"></i> Run</button>
+      <iframe id="preview"></iframe>
+    </div>
+  </main>
 
-<!-- PREVIEW -->
-<div id="preview-panel">
-  <img id="logo" src="https://dominexmacedon.github.io/starlight-programming-language/logo/starlight-lang-logo.png">
-  <iframe id="preview"></iframe>
-</div>
+  <!-- Font Awesome for run icon -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
 
-<script>
-const editor = document.getElementById("editor");
-const preview = document.getElementById("preview");
-const runBtn = document.getElementById("run-btn");
+  <script>
+    // Initialize CodeMirror
+    let editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+      mode: "htmlmixed",
+      theme: "dracula",
+      lineNumbers: true,
+      autoCloseBrackets: true,
+      matchBrackets: true,
+      tabSize: 2,
+      indentWithTabs: true
+    });
 
-/* Syntax highlighting */
-function highlight() {
-  let html = editor.innerText
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;");
+    // Run code in iframe
+    const runBtn = document.getElementById("run-btn");
+    const preview = document.getElementById("preview");
 
-  html = html.replace(/(&lt;!--[\s\S]*?--&gt;)/g,'<span class="comment">$1</span>');
-  html = html.replace(/(&lt;[^&]*&gt;)/g,'<span class="tag">$1</span>');
-  html = html.replace(/(\{[\s\S]*?\})/g,'<span class="css">$1</span>');
-  html = html.replace(/\b(let|const|var|function|if|else|for|while|return)\b/g,'<span class="js">$1</span>');
-
-  editor.innerHTML = html;
-  placeCursorAtEnd(editor);
-}
-
-/* Keep cursor stable */
-function placeCursorAtEnd(el) {
-  const range = document.createRange();
-  const sel = window.getSelection();
-  range.selectNodeContents(el);
-  range.collapse(false);
-  sel.removeAllRanges();
-  sel.addRange(range);
-}
-
-editor.addEventListener("input", highlight);
-
-/* Auto-close brackets */
-editor.addEventListener("keydown", e => {
-  const pairs = { "{":"}", "(":")", "[":"]", "\"":"\"", "'":"'" };
-  if (pairs[e.key]) {
-    e.preventDefault();
-    document.execCommand("insertText", false, e.key + pairs[e.key]);
-    document.execCommand("moveBackward");
-  }
-});
-
-/* Run */
-runBtn.onclick = () => {
-  preview.srcdoc = editor.innerText;
-};
-
-preview.srcdoc = editor.innerText;
-</script>
-
+    runBtn.addEventListener("click", () => {
+      const code = editor.getValue();
+      preview.srcdoc = code;
+    });
+  </script>
 </body>
 </html>
