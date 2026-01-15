@@ -71,13 +71,16 @@
     }
 
     /* Run button top center */
-    .run-container {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-    }
+.run-container {
+  position: absolute;
+  top: 10px;           /* distance from the top */
+  left: 50%;           /* center horizontally */
+  transform: translateX(-50%); /* center adjustment */
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  width: 100%;         /* ensure it spans the editor width */
+}
 
     #run-btn {
       padding: 0.3rem 0.8rem;
