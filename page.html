@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Starlight PageTest</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+
+  <!-- CodeMirror 6 -->
+  <script src="https://cdn.jsdelivr.net/npm/@codemirror/basic-setup@0.19.1/dist/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@codemirror/lang-html@6.4.9/dist/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@codemirror/lang-css@6.2.1/dist/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@codemirror/lang-javascript@6.2.2/dist/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@codemirror/theme-one-dark@6.2.0/dist/index.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #1e1e1e;
+      color: #e0e0e0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      height: 50px;
+      background: #252526;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+      border-bottom: 1px solid #333;
+    }
+
+    header .title {
+      font-size: 1rem;
+      color: #61dafb;
+    }
+
+    header img {
+      height: 32px;
+    }
+
+    .container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+    }
+
+    .editor-panel {
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #333;
+    }
+
+    .editor-toolbar {
+      padding: 0.5rem;
+      background: #2d2d2d;
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid #333;
+    }
+
+    .run-btn {
+      background: #0e639c;
+      color: white;
+      border: none;
+      padding: 0.4rem 0.9rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .run-btn i {
+      margin-right: 6px;
+    }
+
+    .run-btn:hover {
+      background: #1177bb;
+    }
+
+    #editor {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .output-panel {
+      position: relative;
+      background: #ffffff;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: white;
+    }
+
+    .output-label {
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      border-radius: 4px;
+      z-index: 5;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="title">
+    <i class="fa-solid fa-code"></i> Starlight PageTest
+  </div>
+  <img
+    src="https://dominexmacedon.github.io/starlight-programming-language/logo/starlight-lang-logo.png"
+    alt="Starlight Logo"
+  />
+</header>
+
+<div class="container">
+  <div class="editor-panel">
+    <div class="editor-toolbar">
+      <button class="run-btn" onclick="runCode()">
+        <i class="fa-solid fa-play"></i> Run
+      </button>
+    </div>
+    <div id="editor"></div>
+  </div>
+
+  <div class="output-panel">
+    <div class="output-label">
+      <i class="fa-solid fa-display"></i> Output
+    </div>
+    <iframe id="preview"></iframe>
+  </div>
+</div>
+
+<script type="module">
+  import { EditorView, basicSetup } from "https://cdn.jsdelivr.net/npm/@codemirror/basic-setup@0.19.1/dist/index.min.js";
+  import { html } from "https://cdn.jsdelivr.net/npm/@codemirror/lang-html@6.4.9/dist/index.min.js";
+  import { css } from "https://cdn.jsdelivr.net/npm/@codemirror/lang-css@6.2.1/dist/index.min.js";
+  import { javascript } from "https://cdn.jsdelivr.net/npm/@codemirror/lang-javascript@6.2.2/dist/index.min.js";
+  import { oneDark } from "https://cdn.jsdelivr.net/npm/@codemirror/theme-one-dark@6.2.0/dist/index.min.js";
+
+  const editor = new EditorView({
+    doc: "",
+    extensions: [
+      basicSetup,
+      html(),
+      css(),
+      javascript(),
+      oneDark
+    ],
+    parent: document.getElementById("editor")
+  });
+
+  window.runCode = function () {
+    const iframe = document.getElementById("preview");
+    iframe.srcdoc = editor.state.doc.toString();
+  };
+</script>
+
+</body>
+</html>
