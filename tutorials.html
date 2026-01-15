@@ -1909,6 +1909,133 @@ for let p in portfolio {
 sldeploy("Total portfolio value: $" + total)
   </pre>
 </div>
+<h3>52. Employee Management System</h3>
+<div>
+<pre><code># employee_management.sl
+let employees = []
+
+sldeploy("Employee Management System")
+
+while true {
+  let cmd = ask("Choose: add / list / salary / exit")
+
+  if cmd == "exit" { break }
+
+  if cmd == "add" {
+    let name = ask("Employee name:")
+    let role = ask("Role:")
+    let salary = num(ask("Salary:"))
+
+    employees = employees + [{ name: name, role: role, salary: salary }]
+    sldeploy("Employee added successfully")
+  }
+
+  if cmd == "list" {
+    sldeploy("Employees:")
+    for let e in employees {
+      sldeploy(e.name + " | " + e.role + " | $" + e.salary)
+    }
+  }
+
+  if cmd == "salary" {
+    let total = 0
+    for let e in employees { total += e.salary }
+    sldeploy("Total payroll: $" + total)
+  }
+}
+
+sldeploy("Employee Management System closed")
+</code></pre>
+</div>
+
+<h3>53. Inventory & Stock Management System</h3>
+<div>
+<pre><code># inventory_system.sl
+let inventory = []
+
+sldeploy("Inventory & Stock Management System")
+
+while true {
+  let cmd = ask("Command: add / sell / list / exit")
+
+  if cmd == "exit" { break }
+
+  if cmd == "add" {
+    let name = ask("Item name:")
+    let qty = num(ask("Quantity:"))
+    inventory = inventory + [{ name: name, qty: qty }]
+    sldeploy("Item added to inventory")
+  }
+
+  if cmd == "sell" {
+    let name = ask("Item name to sell:")
+    let qty = num(ask("Quantity to sell:"))
+
+    let found = false
+    for let item in inventory {
+      if item.name == name and item.qty >= qty {
+        item.qty -= qty
+        sldeploy("Sold " + qty + " of " + name)
+        found = true
+      }
+    }
+
+    if not found { sldeploy("Item not found or insufficient quantity") }
+  }
+
+  if cmd == "list" {
+    sldeploy("Inventory:")
+    for let i in inventory { sldeploy(i.name + " -> " + i.qty) }
+  }
+}
+
+sldeploy("Inventory Management closed")
+</code></pre>
+</div>
+
+<h3>54. Project Task Management System (Mini Jira/Trello)</h3>
+<div>
+<pre><code># project_manager.sl
+let tasks = []
+
+sldeploy("Project Task Management System")
+
+while true {
+  let cmd = ask("Choose: add / move / list / exit")
+
+  if cmd == "exit" { break }
+
+  if cmd == "add" {
+    let title = ask("Task title:")
+    tasks = tasks + [{ title: title, status: "todo" }]
+    sldeploy("Task added to 'todo'")
+  }
+
+  if cmd == "move" {
+    let title = ask("Task title to move:")
+    let newStatus = ask("New status (todo / doing / done):")
+
+    let found = false
+    for let t in tasks {
+      if t.title == title {
+        t.status = newStatus
+        sldeploy("Task '" + title + "' moved to " + newStatus)
+        found = true
+      }
+    }
+
+    if not found { sldeploy("Task not found") }
+  }
+
+  if cmd == "list" {
+    sldeploy("Tasks:")
+    for let t in tasks { sldeploy(t.title + " [" + t.status + "]") }
+  }
+}
+
+sldeploy("Project Management System closed")
+</code></pre>
+</div>
 
   </main>
 </body>
