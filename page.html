@@ -14,8 +14,10 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/dracula.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/css/css.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/htmlmixed/htmlmixed.min.js"></script>
 
 <style>
 * { box-sizing: border-box; }
@@ -80,11 +82,6 @@ main {
   border: none;
   color: #fff;
   cursor: pointer;
-  font-size: 14px;
-}
-
-.tabs button i {
-  margin-right: 6px;
 }
 
 .tabs button.active {
@@ -117,13 +114,13 @@ iframe {
 }
 
 #console {
-  height: 150px;
+  height: 100%;
   background: #111;
   color: #0f0;
   font-family: monospace;
   overflow-y: auto;
-  padding: 8px;
-  border-top: 2px solid #61dafb;
+  padding: 10px;
+  display: none;
 }
 </style>
 </head>
@@ -136,22 +133,16 @@ iframe {
 </header>
 
 <div class="run-container">
-  <button id="run-btn">
-    <i class="fas fa-play"></i> Run
-  </button>
+  <button id="run-btn"><i class="fas fa-play"></i> Run</button>
 </div>
 
 <main>
 
-<!-- EDITORS -->
+<!-- EDITOR -->
 <div id="editor-container">
   <div class="tabs">
-    <button class="tab active" data-tab="html">
-      <i class="fas fa-code"></i> HTML
-    </button>
-    <button class="tab" data-tab="js">
-      <i class="fab fa-js-square"></i> JavaScript
-    </button>
+    <button class="tab active" data-tab="html"><i class="fas fa-code"></i> HTML</button>
+    <button class="tab" data-tab="js"><i class="fab fa-js-square"></i> JavaScript</button>
   </div>
 
   <textarea id="html-editor" class="editor active">
@@ -159,14 +150,13 @@ iframe {
 <html>
 <body>
   <h1>Hello Starlight</h1>
-  <p>This is HTML output</p>
 </body>
 </html>
   </textarea>
 
   <textarea id="js-editor" class="editor">
-console.log("JavaScript loaded");
-document.body.style.background = "#f0f0f0";
+console.log("JS tab running");
+throw new Error("Test error");
   </textarea>
 </div>
 
@@ -189,39 +179,47 @@ const jsEditor = CodeMirror.fromTextArea(
   { mode: "javascript", theme: "dracula", lineNumbers: true }
 );
 
+let activeTab = "html";
+
 document.querySelectorAll(".tab").forEach(btn => {
   btn.onclick = () => {
+    activeTab = btn.dataset.tab;
+
     document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
     document.querySelectorAll(".editor").forEach(e => e.classList.remove("active"));
+
     btn.classList.add("active");
-    document.getElementById(btn.dataset.tab + "-editor").classList.add("active");
+    document.getElementById(activeTab + "-editor").classList.add("active");
+
+    htmlEditor.refresh();
+    jsEditor.refresh();
+
+    document.getElementById("preview").style.display = activeTab === "html" ? "block" : "none";
+    document.getElementById("console").style.display = activeTab === "js" ? "block" : "none";
   };
 });
 
-const consoleDiv = document.getElementById("console");
+document.getElementById("run-btn").onclick = () => {
+  const iframe = document.getElementById("preview");
+  const consoleDiv = document.getElementById("console");
+  consoleDiv.innerHTML = "";
+
+  if (activeTab === "html") {
+    iframe.srcdoc = htmlEditor.getValue();
+  } else {
+    iframe.srcdoc = `
+<script>
+console.log = (...a)=>parent.postMessage(a.join(" "), "*");
+window.onerror = m => parent.postMessage("ERROR: " + m, "*");
+${jsEditor.getValue()}
+<\/script>
+    `;
+  }
+};
 
 window.addEventListener("message", e => {
-  consoleDiv.innerHTML += e.data + "<br>";
+  document.getElementById("console").innerHTML += e.data + "<br>";
 });
-
-document.getElementById("run-btn").onclick = () => {
-  consoleDiv.innerHTML = "";
-  const html = htmlEditor.getValue();
-  const js = jsEditor.getValue();
-
-  const src = `
-${html}
-<script>
-(function(){
-  console.log = (...a)=>parent.postMessage(a.join(" "), "*");
-  window.onerror = m => parent.postMessage("ERROR: " + m, "*");
-  try { ${js} } catch(e){ parent.postMessage("ERROR: " + e.message, "*"); }
-})();
-<\/script>
-  `;
-
-  document.getElementById("preview").srcdoc = src;
-};
 </script>
 
 </body>
