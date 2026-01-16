@@ -14,10 +14,10 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/dracula.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/xml/xml.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/css/css.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/css/css.min.js"></script>
 
 <style>
 * { box-sizing: border-box; }
@@ -102,25 +102,31 @@ main {
   height: 100%;
 }
 
-#output-container {
-  background: #fff;
-  color: #000;
-  border-left: 2px solid #61dafb;
-}
-
-iframe {
+#js-terminal {
   flex: 1;
-  border: none;
-}
-
-#console {
-  height: 100%;
   background: #111;
   color: #0f0;
   font-family: monospace;
-  overflow-y: auto;
   padding: 10px;
-  display: none;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+
+.terminal-line {
+  display: flex;
+}
+
+.prompt {
+  margin-right: 5px;
+}
+
+.terminal-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #0f0;
+  flex: 1;
+  font-family: monospace;
 }
 </style>
 </head>
@@ -137,48 +143,40 @@ iframe {
 </div>
 
 <main>
+  <!-- EDITORS -->
+  <div id="editor-container">
+    <div class="tabs">
+      <button class="tab active" data-tab="html"><i class="fas fa-code"></i> HTML</button>
+      <button class="tab" data-tab="js"><i class="fab fa-js-square"></i> JavaScript</button>
+    </div>
 
-<!-- EDITOR -->
-<div id="editor-container">
-
-  <div class="tabs">
-    <button class="tab active" data-tab="html">
-      <i class="fas fa-code"></i> HTML
-    </button>
-    <button class="tab" data-tab="js">
-      <i class="fab fa-js-square"></i> JavaScript
-    </button>
-  </div>
-
-  <div id="html-wrapper" class="editor-wrapper active">
-    <textarea id="html-editor">
+    <div id="html-wrapper" class="editor-wrapper active">
+      <textarea id="html-editor">
 <!DOCTYPE html>
 <html>
 <body>
   <h1>Hello Starlight</h1>
 </body>
 </html>
-    </textarea>
+      </textarea>
+    </div>
+
+    <div id="js-wrapper" class="editor-wrapper">
+      <textarea id="js-editor">
+console.log("JS Terminal Ready!");
+      </textarea>
+      <div id="js-terminal"></div>
+    </div>
   </div>
 
-  <div id="js-wrapper" class="editor-wrapper">
-    <textarea id="js-editor">
-console.log("JS tab running");
-throw new Error("Test error");
-    </textarea>
+  <!-- OUTPUT -->
+  <div id="output-container">
+    <iframe id="preview"></iframe>
   </div>
-
-</div>
-
-<!-- OUTPUT -->
-<div id="output-container">
-  <iframe id="preview"></iframe>
-  <div id="console"></div>
-</div>
-
 </main>
 
 <script>
+/* --------------------- Editors --------------------- */
 const htmlEditor = CodeMirror.fromTextArea(
   document.getElementById("html-editor"),
   { mode: "htmlmixed", theme: "dracula", lineNumbers: true }
@@ -203,36 +201,66 @@ document.querySelectorAll(".tab").forEach(tab => {
 
     htmlEditor.refresh();
     jsEditor.refresh();
-
-    document.getElementById("preview").style.display =
-      activeTab === "html" ? "block" : "none";
-
-    document.getElementById("console").style.display =
-      activeTab === "js" ? "block" : "none";
   };
 });
 
-document.getElementById("run-btn").onclick = () => {
-  const iframe = document.getElementById("preview");
-  const consoleDiv = document.getElementById("console");
-  consoleDiv.innerHTML = "";
+/* --------------------- JS Terminal --------------------- */
+const terminalDiv = document.getElementById("js-terminal");
 
-  if (activeTab === "html") {
-    iframe.srcdoc = htmlEditor.getValue();
+// Add a new terminal line with input
+function addTerminalLine(promptText="js> "){
+  const line = document.createElement("div");
+  line.className = "terminal-line";
+  const prompt = document.createElement("span");
+  prompt.className = "prompt";
+  prompt.textContent = promptText;
+  const input = document.createElement("input");
+  input.className = "terminal-input";
+  input.autofocus = true;
+  input.addEventListener("keydown", handleTerminalInput);
+  line.appendChild(prompt);
+  line.appendChild(input);
+  terminalDiv.appendChild(line);
+  input.focus();
+  terminalDiv.scrollTop = terminalDiv.scrollHeight;
+}
+
+// Handle JS command input
+function handleTerminalInput(e){
+  if(e.key !== "Enter") return;
+  const input = e.target;
+  const cmd = input.value.trim();
+  input.disabled = true;
+
+  if(!cmd){
+    addTerminalLine();
+    return;
+  }
+
+  // Output result
+  try {
+    const result = Function('"use strict"; ' + cmd)();
+    const outputLine = document.createElement("div");
+    outputLine.textContent = "> " + cmd + "\n" + (result !== undefined ? result : "");
+    terminalDiv.appendChild(outputLine);
+  } catch(err) {
+    const errorLine = document.createElement("div");
+    errorLine.textContent = "> " + cmd + "\nError: " + err.message;
+    terminalDiv.appendChild(errorLine);
+  }
+
+  addTerminalLine();
+}
+
+/* --------------------- Run Button --------------------- */
+document.getElementById("run-btn").onclick = () => {
+  if(activeTab === "html"){
+    document.getElementById("preview").srcdoc = htmlEditor.getValue();
   } else {
-    iframe.srcdoc = `
-<script>
-console.log = (...a)=>parent.postMessage(a.join(" "), "*");
-window.onerror = m => parent.postMessage("ERROR: " + m, "*");
-${jsEditor.getValue()}
-<\/script>
-    `;
+    terminalDiv.innerHTML = "";
+    addTerminalLine();
   }
 };
-
-window.addEventListener("message", e => {
-  document.getElementById("console").innerHTML += e.data + "<br>";
-});
 </script>
 
 </body>
