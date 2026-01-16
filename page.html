@@ -106,7 +106,6 @@ main {
   background: #fff;
   color: #000;
   border-left: 2px solid #61dafb;
-  position: relative;
 }
 
 iframe {
@@ -114,30 +113,14 @@ iframe {
   border: none;
 }
 
-#terminal {
+#console {
   height: 100%;
   background: #111;
   color: #0f0;
   font-family: monospace;
-  padding: 10px;
   overflow-y: auto;
-  white-space: pre-wrap;
+  padding: 10px;
   display: none;
-  flex-direction: column;
-}
-.terminal-line {
-  display: flex;
-}
-.terminal-prompt {
-  margin-right: 5px;
-}
-.terminal-input {
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #0f0;
-  font-family: monospace;
-  flex: 1;
 }
 </style>
 </head>
@@ -180,7 +163,8 @@ iframe {
 
   <div id="js-wrapper" class="editor-wrapper">
     <textarea id="js-editor">
-console.log("JS CLI ready");
+console.log("JS tab running");
+throw new Error("Test error");
     </textarea>
   </div>
 
@@ -189,17 +173,17 @@ console.log("JS CLI ready");
 <!-- OUTPUT -->
 <div id="output-container">
   <iframe id="preview"></iframe>
-  <div id="terminal"></div>
+  <div id="console"></div>
 </div>
 
 </main>
 
 <script>
-// Initialize CodeMirror
 const htmlEditor = CodeMirror.fromTextArea(
   document.getElementById("html-editor"),
   { mode: "htmlmixed", theme: "dracula", lineNumbers: true }
 );
+
 const jsEditor = CodeMirror.fromTextArea(
   document.getElementById("js-editor"),
   { mode: "javascript", theme: "dracula", lineNumbers: true }
@@ -207,81 +191,49 @@ const jsEditor = CodeMirror.fromTextArea(
 
 let activeTab = "html";
 
-// Tab switching
 document.querySelectorAll(".tab").forEach(tab => {
   tab.onclick = () => {
     activeTab = tab.dataset.tab;
+
     document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
     document.querySelectorAll(".editor-wrapper").forEach(w => w.classList.remove("active"));
+
     tab.classList.add("active");
     document.getElementById(activeTab + "-wrapper").classList.add("active");
 
     htmlEditor.refresh();
     jsEditor.refresh();
 
-    document.getElementById("preview").style.display = activeTab === "html" ? "block" : "none";
-    document.getElementById("terminal").style.display = activeTab === "js" ? "flex" : "none";
+    document.getElementById("preview").style.display =
+      activeTab === "html" ? "block" : "none";
+
+    document.getElementById("console").style.display =
+      activeTab === "js" ? "block" : "none";
   };
 });
 
-// JS Terminal
-const terminal = document.getElementById("terminal");
-function addTerminalLine(text = "", isInput = false) {
-  const div = document.createElement("div");
-  div.className = "terminal-line";
-
-  if (isInput) {
-    const prompt = document.createElement("span");
-    prompt.className = "terminal-prompt";
-    prompt.textContent = "js> ";
-    const input = document.createElement("input");
-    input.className = "terminal-input";
-    input.autofocus = true;
-    input.addEventListener("keydown", handleTerminalInput);
-    div.appendChild(prompt);
-    div.appendChild(input);
-    terminal.appendChild(div);
-    input.focus();
-  } else {
-    div.textContent = text;
-    terminal.appendChild(div);
-  }
-  terminal.scrollTop = terminal.scrollHeight;
-}
-
-function handleTerminalInput(e) {
-  if (e.key !== "Enter") return;
-  const input = e.target;
-  const code = input.value.trim();
-  input.disabled = true;
-
-  if (!code) { addTerminalLine("", true); return; }
-
-  try {
-    // Execute JS code in isolated function
-    let result = (function(){
-      return eval(code);
-    })();
-    addTerminalLine(String(result));
-  } catch(err) {
-    addTerminalLine("Error: " + err.message);
-  }
-
-  addTerminalLine("", true);
-}
-
-// Run button behavior
 document.getElementById("run-btn").onclick = () => {
-  if(activeTab === "html"){
-    document.getElementById("preview").srcdoc = htmlEditor.getValue();
+  const iframe = document.getElementById("preview");
+  const consoleDiv = document.getElementById("console");
+  consoleDiv.innerHTML = "";
+
+  if (activeTab === "html") {
+    iframe.srcdoc = htmlEditor.getValue();
   } else {
-    // Clear terminal
-    terminal.innerHTML = "";
-    addTerminalLine("JS CLI Terminal ready. Type commands below.", false);
-    addTerminalLine("", true);
+    iframe.srcdoc = `
+<script>
+console.log = (...a)=>parent.postMessage(a.join(" "), "*");
+window.onerror = m => parent.postMessage("ERROR: " + m, "*");
+${jsEditor.getValue()}
+<\/script>
+    `;
   }
 };
+
+window.addEventListener("message", e => {
+  document.getElementById("console").innerHTML += e.data + "<br>";
+});
 </script>
 
 </body>
-</html>
+</html> 
