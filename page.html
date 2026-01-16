@@ -1,225 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Starlight Page Test</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Starlight Page Test</title>
 
-  <link rel="icon" href="https://dominexmacedon.github.io/starlight-programming-language/logo/starlight-lang-logo.png">
+<link rel="icon" href="https://dominexmacedon.github.io/starlight-programming-language/logo/starlight-lang-logo.png">
 
-  <!-- CodeMirror -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/dracula.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/htmlmixed/htmlmixed.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      background: #1e1e1e;
-      color: #e0e0e0;
-      font-family: Segoe UI, sans-serif;
-      display: flex;
-      flex-direction: column;
-    }
+<!-- CodeMirror -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/dracula.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
 
-    header {
-      background: #282c34;
-      padding: 0.5rem 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+<style>
+* { box-sizing: border-box; }
 
-    main {
-      flex: 1;
-      display: flex;
-    }
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #1e1e1e;
+  color: #fff;
+  font-family: Segoe UI, sans-serif;
+}
 
-    #editor-container, #output-container {
-      width: 50%;
-      position: relative;
-    }
+header {
+  background: #282c34;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    /* Tabs */
-    .tabs {
-      display: flex;
-      background: #111;
-    }
+main {
+  flex: 1;
+  display: flex;
+  position: relative;
+}
 
-    .tab {
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-      color: #aaa;
-      border-bottom: 2px solid transparent;
-    }
+#editor-container, #output-container {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 
-    .tab.active {
-      color: #61dafb;
-      border-bottom: 2px solid #61dafb;
-    }
+.run-container {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+}
 
-    .editor {
-      height: calc(100% - 34px);
-      display: none;
-    }
+#run-btn {
+  padding: 6px 14px;
+  background: #61dafb;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-    .editor.active {
-      display: block;
-    }
+.tabs {
+  display: flex;
+  background: #111;
+}
 
-    .CodeMirror {
-      height: 100%;
-    }
+.tabs button {
+  flex: 1;
+  padding: 10px;
+  background: #222;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+}
 
-    /* Run button */
-    .run-container {
-      position: absolute;
-      top: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-    }
+.tabs button i {
+  margin-right: 6px;
+}
 
-    #run-btn {
-      padding: 0.3rem 0.8rem;
-      background: #61dafb;
-      border: none;
-      border-radius: 4px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.tabs button.active {
+  background: #61dafb;
+  color: #000;
+}
 
-    /* Output */
-    #output-container {
-      background: white;
-      border-left: 2px solid #61dafb;
-    }
+.editor {
+  flex: 1;
+  display: none;
+}
 
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
+.editor.active {
+  display: block;
+}
 
-    /* Console overlay */
-    #console {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      max-height: 40%;
-      overflow-y: auto;
-      background: #111;
-      color: #0f0;
-      font-size: 0.85rem;
-      padding: 0.5rem;
-      font-family: monospace;
-      border-top: 2px solid #61dafb;
-    }
+.CodeMirror {
+  height: 100%;
+}
 
-    .error { color: #ff4d4d; }
-    .warn { color: #ffd166; }
-  </style>
+#output-container {
+  background: #fff;
+  color: #000;
+  border-left: 2px solid #61dafb;
+}
+
+iframe {
+  flex: 1;
+  border: none;
+}
+
+#console {
+  height: 150px;
+  background: #111;
+  color: #0f0;
+  font-family: monospace;
+  overflow-y: auto;
+  padding: 8px;
+  border-top: 2px solid #61dafb;
+}
+</style>
 </head>
 
 <body>
 
 <header>
-  <h1>Starlight Page Test</h1>
+  <h3>Starlight Page Test</h3>
+  <img src="https://dominexmacedon.github.io/starlight-programming-language/logo/starlight-lang-logo.png" height="36">
 </header>
 
 <div class="run-container">
-  <button id="run-btn">▶ Run</button>
+  <button id="run-btn">
+    <i class="fas fa-play"></i> Run
+  </button>
 </div>
 
 <main>
-  <div id="editor-container">
-    <div class="tabs">
-      <div class="tab active" data-tab="html">HTML</div>
-      <div class="tab" data-tab="js">JavaScript</div>
-    </div>
 
-    <div id="html" class="editor active">
-      <textarea id="html-editor">
+<!-- EDITORS -->
+<div id="editor-container">
+  <div class="tabs">
+    <button class="tab active" data-tab="html">
+      <i class="fas fa-code"></i> HTML
+    </button>
+    <button class="tab" data-tab="js">
+      <i class="fab fa-js-square"></i> JavaScript
+    </button>
+  </div>
+
+  <textarea id="html-editor" class="editor active">
 <!DOCTYPE html>
 <html>
 <body>
-  <h1>Hello Starlight!</h1>
-  <p>Open console output below 👇</p>
+  <h1>Hello Starlight</h1>
+  <p>This is HTML output</p>
 </body>
 </html>
-      </textarea>
-    </div>
+  </textarea>
 
-    <div id="js" class="editor">
-      <textarea id="js-editor">
-console.log("JS is working!");
-// Try: undefinedVariable
-      </textarea>
-    </div>
-  </div>
+  <textarea id="js-editor" class="editor">
+console.log("JavaScript loaded");
+document.body.style.background = "#f0f0f0";
+  </textarea>
+</div>
 
-  <div id="output-container">
-    <iframe id="preview"></iframe>
-    <div id="console"></div>
-  </div>
+<!-- OUTPUT -->
+<div id="output-container">
+  <iframe id="preview"></iframe>
+  <div id="console"></div>
+</div>
+
 </main>
 
 <script>
-  const htmlEditor = CodeMirror.fromTextArea(
-    document.getElementById("html-editor"),
-    { mode: "htmlmixed", theme: "dracula", lineNumbers: true }
-  );
+const htmlEditor = CodeMirror.fromTextArea(
+  document.getElementById("html-editor"),
+  { mode: "htmlmixed", theme: "dracula", lineNumbers: true }
+);
 
-  const jsEditor = CodeMirror.fromTextArea(
-    document.getElementById("js-editor"),
-    { mode: "javascript", theme: "dracula", lineNumbers: true }
-  );
+const jsEditor = CodeMirror.fromTextArea(
+  document.getElementById("js-editor"),
+  { mode: "javascript", theme: "dracula", lineNumbers: true }
+);
 
-  // Tabs
-  document.querySelectorAll(".tab").forEach(tab => {
-    tab.onclick = () => {
-      document.querySelectorAll(".tab, .editor").forEach(el => el.classList.remove("active"));
-      tab.classList.add("active");
-      document.getElementById(tab.dataset.tab).classList.add("active");
-    };
-  });
-
-  const runBtn = document.getElementById("run-btn");
-  const iframe = document.getElementById("preview");
-  const consoleBox = document.getElementById("console");
-
-  runBtn.onclick = () => {
-    consoleBox.innerHTML = "";
-
-    const html = htmlEditor.getValue();
-    const js = jsEditor.getValue();
-
-    iframe.srcdoc = `
-      ${html}
-      <script>
-        const send = (type, msg) =>
-          parent.postMessage({ type, msg }, "*");
-
-        console.log = (...a) => send("log", a.join(" "));
-        console.error = (...a) => send("error", a.join(" "));
-        console.warn = (...a) => send("warn", a.join(" "));
-
-        window.onerror = (m,l) =>
-          send("error", m + " (line " + l + ")");
-
-        try { ${js} } catch(e) { console.error(e.message); }
-      <\/script>
-    `;
+document.querySelectorAll(".tab").forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".editor").forEach(e => e.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab + "-editor").classList.add("active");
   };
+});
 
-  window.addEventListener("message", e => {
-    const div = document.createElement("div");
-    div.className = e.data.type;
-    div.textContent = `[${e.data.type}] ${e.data.msg}`;
-    consoleBox.appendChild(div);
-  });
+const consoleDiv = document.getElementById("console");
+
+window.addEventListener("message", e => {
+  consoleDiv.innerHTML += e.data + "<br>";
+});
+
+document.getElementById("run-btn").onclick = () => {
+  consoleDiv.innerHTML = "";
+  const html = htmlEditor.getValue();
+  const js = jsEditor.getValue();
+
+  const src = `
+${html}
+<script>
+(function(){
+  console.log = (...a)=>parent.postMessage(a.join(" "), "*");
+  window.onerror = m => parent.postMessage("ERROR: " + m, "*");
+  try { ${js} } catch(e){ parent.postMessage("ERROR: " + e.message, "*"); }
+})();
+<\/script>
+  `;
+
+  document.getElementById("preview").srcdoc = src;
+};
 </script>
 
 </body>
