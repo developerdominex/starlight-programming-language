@@ -2,105 +2,98 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Starlight Language Online Page Test - Edit HTML, CSS, JS with live preview.">
-  <meta name="keywords" content="Starlight, Starlight Language, CLI, HTML, CSS, JavaScript, Code Editor, Live Preview">
   <title>Starlight Page Test</title>
 
-  <!-- Logo favicon -->
   <link rel="icon" href="https://dominexmacedon.github.io/starlight-programming-language/logo/starlight-lang-logo.png">
 
   <!-- CodeMirror -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/dracula.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/xml/xml.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/css/css.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/htmlmixed/htmlmixed.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/edit/closebrackets.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/edit/matchbrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
-      padding: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #1e1e1e;
-      color: #e0e0e0;
       height: 100vh;
+      background: #1e1e1e;
+      color: #e0e0e0;
+      font-family: Segoe UI, sans-serif;
       display: flex;
       flex-direction: column;
     }
 
     header {
-      background-color: #282c34;
+      background: #282c34;
       padding: 0.5rem 1rem;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 1.2rem;
-      color: #61dafb;
-    }
-
-    header img {
-      height: 40px;
+      align-items: center;
     }
 
     main {
       flex: 1;
       display: flex;
-      overflow: hidden;
-      position: relative;
     }
 
     #editor-container, #output-container {
       width: 50%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
       position: relative;
     }
 
-    /* Run button top center */
-.run-container {
-  position: absolute;
-  top: 10px;           /* distance from the top */
-  left: 50%;           /* center horizontally */
-  transform: translateX(-50%); /* center adjustment */
-  z-index: 10;
-  display: flex;
-  justify-content: center;
-  width: 100%;         /* ensure it spans the editor width */
-}
-
-    #run-btn {
-      padding: 0.3rem 0.8rem;
-      background-color: #61dafb;
-      color: #1e1e1e;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 0.9rem;
+    /* Tabs */
+    .tabs {
+      display: flex;
+      background: #111;
     }
 
-    #editor, #preview {
-      flex: 1;
+    .tab {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      color: #aaa;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab.active {
+      color: #61dafb;
+      border-bottom: 2px solid #61dafb;
+    }
+
+    .editor {
+      height: calc(100% - 34px);
+      display: none;
+    }
+
+    .editor.active {
+      display: block;
+    }
+
+    .CodeMirror {
       height: 100%;
     }
 
+    /* Run button */
+    .run-container {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+    }
+
+    #run-btn {
+      padding: 0.3rem 0.8rem;
+      background: #61dafb;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Output */
     #output-container {
-      background-color: #ffffff;
-      color: #000000;
+      background: white;
       border-left: 2px solid #61dafb;
     }
 
@@ -110,68 +103,124 @@
       border: none;
     }
 
-    .CodeMirror {
-      height: 100%;
+    /* Console overlay */
+    #console {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      max-height: 40%;
+      overflow-y: auto;
+      background: #111;
+      color: #0f0;
+      font-size: 0.85rem;
+      padding: 0.5rem;
+      font-family: monospace;
+      border-top: 2px solid #61dafb;
     }
+
+    .error { color: #ff4d4d; }
+    .warn { color: #ffd166; }
   </style>
 </head>
+
 <body>
-  <header>
-    <h1>Starlight Page Test</h1>
-    <img src="https://dominexmacedon.github.io/starlight-programming-language/logo/starlight-lang-logo.png" alt="Starlight Logo">
-  </header>
+
+<header>
+  <h1>Starlight Page Test</h1>
+</header>
+
 <div class="run-container">
-        <button id="run-btn"><i class="fas fa-play"></i> Run</button>
-      </div>
-  <main>
-    <div id="editor-container">
-      
-      <textarea id="editor"><!DOCTYPE html>
+  <button id="run-btn">▶ Run</button>
+</div>
+
+<main>
+  <div id="editor-container">
+    <div class="tabs">
+      <div class="tab active" data-tab="html">HTML</div>
+      <div class="tab" data-tab="js">JavaScript</div>
+    </div>
+
+    <div id="html" class="editor active">
+      <textarea id="html-editor">
+<!DOCTYPE html>
 <html>
-<head>
-  <title>Preview</title>
-  <style>
-    body { font-family: sans-serif; background: #f0f0f0; padding: 2rem; }
-    h1 { color: #61dafb; }
-  </style>
-</head>
 <body>
   <h1>Hello Starlight!</h1>
-  <p>Edit HTML, CSS, and JS here.</p>
-  <script>
-    console.log("JS works!");
-  </script>
+  <p>Open console output below 👇</p>
 </body>
-</html></textarea>
+</html>
+      </textarea>
     </div>
 
-    <div id="output-container">
-      <iframe id="preview"></iframe>
+    <div id="js" class="editor">
+      <textarea id="js-editor">
+console.log("JS is working!");
+// Try: undefinedVariable
+      </textarea>
     </div>
-  </main>
+  </div>
 
-  <!-- Font Awesome -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+  <div id="output-container">
+    <iframe id="preview"></iframe>
+    <div id="console"></div>
+  </div>
+</main>
 
-  <script>
-    // Initialize CodeMirror
-    let editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
-      mode: "htmlmixed",
-      theme: "dracula",
-      lineNumbers: true,
-      autoCloseBrackets: true,
-      matchBrackets: true,
-      tabSize: 2,
-      indentWithTabs: true
-    });
+<script>
+  const htmlEditor = CodeMirror.fromTextArea(
+    document.getElementById("html-editor"),
+    { mode: "htmlmixed", theme: "dracula", lineNumbers: true }
+  );
 
-    const runBtn = document.getElementById("run-btn");
-    const preview = document.getElementById("preview");
+  const jsEditor = CodeMirror.fromTextArea(
+    document.getElementById("js-editor"),
+    { mode: "javascript", theme: "dracula", lineNumbers: true }
+  );
 
-    runBtn.addEventListener("click", () => {
-      const code = editor.getValue();
-      preview.srcdoc = code;
-    });
-  </script>
+  // Tabs
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.onclick = () => {
+      document.querySelectorAll(".tab, .editor").forEach(el => el.classList.remove("active"));
+      tab.classList.add("active");
+      document.getElementById(tab.dataset.tab).classList.add("active");
+    };
+  });
+
+  const runBtn = document.getElementById("run-btn");
+  const iframe = document.getElementById("preview");
+  const consoleBox = document.getElementById("console");
+
+  runBtn.onclick = () => {
+    consoleBox.innerHTML = "";
+
+    const html = htmlEditor.getValue();
+    const js = jsEditor.getValue();
+
+    iframe.srcdoc = `
+      ${html}
+      <script>
+        const send = (type, msg) =>
+          parent.postMessage({ type, msg }, "*");
+
+        console.log = (...a) => send("log", a.join(" "));
+        console.error = (...a) => send("error", a.join(" "));
+        console.warn = (...a) => send("warn", a.join(" "));
+
+        window.onerror = (m,l) =>
+          send("error", m + " (line " + l + ")");
+
+        try { ${js} } catch(e) { console.error(e.message); }
+      <\/script>
+    `;
+  };
+
+  window.addEventListener("message", e => {
+    const div = document.createElement("div");
+    div.className = e.data.type;
+    div.textContent = `[${e.data.type}] ${e.data.msg}`;
+    consoleBox.appendChild(div);
+  });
+</script>
+
 </body>
 </html>
