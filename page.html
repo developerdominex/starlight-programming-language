@@ -89,12 +89,12 @@ main {
   color: #000;
 }
 
-.editor {
+.editor-wrapper {
   flex: 1;
   display: none;
 }
 
-.editor.active {
+.editor-wrapper.active {
   display: block;
 }
 
@@ -140,24 +140,34 @@ iframe {
 
 <!-- EDITOR -->
 <div id="editor-container">
+
   <div class="tabs">
-    <button class="tab active" data-tab="html"><i class="fas fa-code"></i> HTML</button>
-    <button class="tab" data-tab="js"><i class="fab fa-js-square"></i> JavaScript</button>
+    <button class="tab active" data-tab="html">
+      <i class="fas fa-code"></i> HTML
+    </button>
+    <button class="tab" data-tab="js">
+      <i class="fab fa-js-square"></i> JavaScript
+    </button>
   </div>
 
-  <textarea id="html-editor" class="editor active">
+  <div id="html-wrapper" class="editor-wrapper active">
+    <textarea id="html-editor">
 <!DOCTYPE html>
 <html>
 <body>
   <h1>Hello Starlight</h1>
 </body>
 </html>
-  </textarea>
+    </textarea>
+  </div>
 
-  <textarea id="js-editor" class="editor">
+  <div id="js-wrapper" class="editor-wrapper">
+    <textarea id="js-editor">
 console.log("JS tab running");
 throw new Error("Test error");
-  </textarea>
+    </textarea>
+  </div>
+
 </div>
 
 <!-- OUTPUT -->
@@ -181,21 +191,24 @@ const jsEditor = CodeMirror.fromTextArea(
 
 let activeTab = "html";
 
-document.querySelectorAll(".tab").forEach(btn => {
-  btn.onclick = () => {
-    activeTab = btn.dataset.tab;
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.onclick = () => {
+    activeTab = tab.dataset.tab;
 
     document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
-    document.querySelectorAll(".editor").forEach(e => e.classList.remove("active"));
+    document.querySelectorAll(".editor-wrapper").forEach(w => w.classList.remove("active"));
 
-    btn.classList.add("active");
-    document.getElementById(activeTab + "-editor").classList.add("active");
+    tab.classList.add("active");
+    document.getElementById(activeTab + "-wrapper").classList.add("active");
 
     htmlEditor.refresh();
     jsEditor.refresh();
 
-    document.getElementById("preview").style.display = activeTab === "html" ? "block" : "none";
-    document.getElementById("console").style.display = activeTab === "js" ? "block" : "none";
+    document.getElementById("preview").style.display =
+      activeTab === "html" ? "block" : "none";
+
+    document.getElementById("console").style.display =
+      activeTab === "js" ? "block" : "none";
   };
 });
 
