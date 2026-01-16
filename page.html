@@ -134,6 +134,11 @@ iframe {
 
 <div class="run-container">
   <button id="run-btn"><i class="fas fa-play"></i> Run</button>
+  <!-- Next to Run button -->
+<button id="tutorial-btn" style="padding:6px 14px; margin-left:8px; background:#ffcc00; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">
+  <i class="fas fa-book"></i> Learn Starlight Tutorials
+</button>
+
 </div>
 
 <main>
@@ -190,6 +195,15 @@ const jsEditor = CodeMirror.fromTextArea(
 );
 
 let activeTab = "html";
+document.getElementById("tutorial-btn").onclick = () => {
+  // Show iframe
+  const iframe = document.getElementById("preview");
+  const consoleDiv = document.getElementById("console");
+
+  consoleDiv.style.display = "none"; // hide JS terminal
+  iframe.style.display = "block";    // show HTML iframe
+  iframe.src = "https://dominexmacedon.github.io/starlight-programming-language/tutorials.html";
+};
 
 document.querySelectorAll(".tab").forEach(tab => {
   tab.onclick = () => {
