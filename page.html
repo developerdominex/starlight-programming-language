@@ -3,11 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Starlight Page Test</title>
+<title>JS Terminal Starlight</title>
 
 <link rel="icon" href="https://dominexmacedon.github.io/starlight-programming-language/logo/starlight-lang-logo.png">
-
-<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <!-- CodeMirror -->
@@ -20,16 +18,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/css/css.min.js"></script>
 
 <style>
-* { box-sizing: border-box; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  margin: 0;
+  font-family: Segoe UI, sans-serif;
   height: 100vh;
   display: flex;
   flex-direction: column;
   background: #1e1e1e;
   color: #fff;
-  font-family: Segoe UI, sans-serif;
 }
 
 header {
@@ -43,7 +40,7 @@ header {
 main {
   flex: 1;
   display: flex;
-  position: relative;
+  overflow: hidden;
 }
 
 #editor-container, #output-container {
@@ -102,6 +99,7 @@ main {
   height: 100%;
 }
 
+/* Custom JS Terminal */
 #js-terminal {
   flex: 1;
   background: #111;
@@ -110,10 +108,12 @@ main {
   padding: 10px;
   overflow-y: auto;
   white-space: pre-wrap;
+  border-top: 2px solid #61dafb;
 }
 
 .terminal-line {
   display: flex;
+  align-items: center;
 }
 
 .prompt {
@@ -127,10 +127,10 @@ main {
   color: #0f0;
   flex: 1;
   font-family: monospace;
+  font-size: 14px;
 }
 </style>
 </head>
-
 <body>
 
 <header>
@@ -143,125 +143,121 @@ main {
 </div>
 
 <main>
-  <!-- EDITORS -->
-  <div id="editor-container">
-    <div class="tabs">
-      <button class="tab active" data-tab="html"><i class="fas fa-code"></i> HTML</button>
-      <button class="tab" data-tab="js"><i class="fab fa-js-square"></i> JavaScript</button>
-    </div>
+<div id="editor-container">
+  <div class="tabs">
+    <button class="tab active" data-tab="html"><i class="fas fa-code"></i> HTML</button>
+    <button class="tab" data-tab="js"><i class="fab fa-js-square"></i> JavaScript</button>
+  </div>
 
-    <div id="html-wrapper" class="editor-wrapper active">
-      <textarea id="html-editor">
+  <!-- HTML Editor -->
+  <div id="html-wrapper" class="editor-wrapper active">
+    <textarea id="html-editor">
 <!DOCTYPE html>
 <html>
 <body>
   <h1>Hello Starlight</h1>
 </body>
 </html>
-      </textarea>
-    </div>
-
-    <div id="js-wrapper" class="editor-wrapper">
-      <textarea id="js-editor">
-console.log("JS Terminal Ready!");
-      </textarea>
-      <div id="js-terminal"></div>
-    </div>
+    </textarea>
   </div>
 
-  <!-- OUTPUT -->
-  <div id="output-container">
-    <iframe id="preview"></iframe>
+  <!-- JS Terminal -->
+  <div id="js-wrapper" class="editor-wrapper">
+    <div id="js-terminal"></div>
   </div>
+</div>
+
+<!-- Output -->
+<div id="output-container">
+  <iframe id="preview"></iframe>
+</div>
 </main>
 
 <script>
-/* --------------------- Editors --------------------- */
+// CodeMirror HTML Editor
 const htmlEditor = CodeMirror.fromTextArea(
   document.getElementById("html-editor"),
   { mode: "htmlmixed", theme: "dracula", lineNumbers: true }
 );
 
-const jsEditor = CodeMirror.fromTextArea(
-  document.getElementById("js-editor"),
-  { mode: "javascript", theme: "dracula", lineNumbers: true }
-);
-
+// Tab logic
 let activeTab = "html";
 
 document.querySelectorAll(".tab").forEach(tab => {
   tab.onclick = () => {
     activeTab = tab.dataset.tab;
-
     document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
     document.querySelectorAll(".editor-wrapper").forEach(w => w.classList.remove("active"));
-
     tab.classList.add("active");
     document.getElementById(activeTab + "-wrapper").classList.add("active");
-
     htmlEditor.refresh();
-    jsEditor.refresh();
+    if(activeTab === "html") {
+      document.getElementById("preview").style.display = "block";
+    } else {
+      document.getElementById("preview").style.display = "none";
+      initJSTerminal();
+    }
   };
 });
 
-/* --------------------- JS Terminal --------------------- */
-const terminalDiv = document.getElementById("js-terminal");
-
-// Add a new terminal line with input
-function addTerminalLine(promptText="js> "){
-  const line = document.createElement("div");
-  line.className = "terminal-line";
-  const prompt = document.createElement("span");
-  prompt.className = "prompt";
-  prompt.textContent = promptText;
-  const input = document.createElement("input");
-  input.className = "terminal-input";
-  input.autofocus = true;
-  input.addEventListener("keydown", handleTerminalInput);
-  line.appendChild(prompt);
-  line.appendChild(input);
-  terminalDiv.appendChild(line);
-  input.focus();
-  terminalDiv.scrollTop = terminalDiv.scrollHeight;
-}
-
-// Handle JS command input
-function handleTerminalInput(e){
-  if(e.key !== "Enter") return;
-  const input = e.target;
-  const cmd = input.value.trim();
-  input.disabled = true;
-
-  if(!cmd){
-    addTerminalLine();
-    return;
-  }
-
-  // Output result
-  try {
-    const result = Function('"use strict"; ' + cmd)();
-    const outputLine = document.createElement("div");
-    outputLine.textContent = "> " + cmd + "\n" + (result !== undefined ? result : "");
-    terminalDiv.appendChild(outputLine);
-  } catch(err) {
-    const errorLine = document.createElement("div");
-    errorLine.textContent = "> " + cmd + "\nError: " + err.message;
-    terminalDiv.appendChild(errorLine);
-  }
-
-  addTerminalLine();
-}
-
-/* --------------------- Run Button --------------------- */
+// Run button for HTML tab
 document.getElementById("run-btn").onclick = () => {
-  if(activeTab === "html"){
+  if(activeTab === "html") {
     document.getElementById("preview").srcdoc = htmlEditor.getValue();
-  } else {
-    terminalDiv.innerHTML = "";
-    addTerminalLine();
   }
 };
-</script>
 
+// Custom JS Terminal
+function initJSTerminal(){
+  const term = document.getElementById("js-terminal");
+  if(term.dataset.initialized) return;
+  term.dataset.initialized = true;
+
+  function addLine(text="", isInput=false){
+    const div = document.createElement("div");
+    div.className = "terminal-line";
+    if(isInput){
+      const span = document.createElement("span");
+      span.className = "prompt";
+      span.textContent = "js> ";
+      const input = document.createElement("input");
+      input.className = "terminal-input";
+      input.autofocus = true;
+      input.addEventListener("keydown", handleInput);
+      div.appendChild(span);
+      div.appendChild(input);
+      term.appendChild(div);
+      input.focus();
+    } else {
+      div.textContent = text;
+      term.appendChild(div);
+    }
+    term.scrollTop = term.scrollHeight;
+  }
+
+  function handleInput(e){
+    if(e.key !== "Enter") return;
+    const input = e.target;
+    const line = input.value.trim();
+    input.disabled = true;
+
+    if(!line) { addLine("", true); return; }
+
+    try{
+      let result = Function('"use strict"; return (' + line + ')')();
+      addLine(String(result));
+    } catch(err){
+      addLine("Error: " + err.message);
+    }
+
+    addLine("", true);
+  }
+
+  addLine("JavaScript Terminal Active");
+  addLine("Type any JS command. Example: 2+3, console.log('hi'), Math.sqrt(16)");
+  addLine("", true);
+}
+
+</script>
 </body>
 </html>
