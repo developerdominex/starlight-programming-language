@@ -3,30 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JS Terminal Starlight</title>
+<title>Starlight Page Test</title>
 
 <link rel="icon" href="https://dominexmacedon.github.io/starlight-programming-language/logo/starlight-lang-logo.png">
+
+<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <!-- CodeMirror -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/dracula.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/htmlmixed/htmlmixed.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/xml/xml.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/htmlmixed/htmlmixed.min.js"></script>
 
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; }
 
 body {
-  font-family: Segoe UI, sans-serif;
+  margin: 0;
   height: 100vh;
   display: flex;
   flex-direction: column;
   background: #1e1e1e;
   color: #fff;
+  font-family: Segoe UI, sans-serif;
 }
 
 header {
@@ -40,7 +43,7 @@ header {
 main {
   flex: 1;
   display: flex;
-  overflow: hidden;
+  position: relative;
 }
 
 #editor-container, #output-container {
@@ -99,38 +102,46 @@ main {
   height: 100%;
 }
 
-/* Custom JS Terminal */
-#js-terminal {
+#output-container {
+  background: #fff;
+  color: #000;
+  border-left: 2px solid #61dafb;
+  position: relative;
+}
+
+iframe {
   flex: 1;
+  border: none;
+}
+
+#terminal {
+  height: 100%;
   background: #111;
   color: #0f0;
   font-family: monospace;
   padding: 10px;
   overflow-y: auto;
   white-space: pre-wrap;
-  border-top: 2px solid #61dafb;
+  display: none;
+  flex-direction: column;
 }
-
 .terminal-line {
   display: flex;
-  align-items: center;
 }
-
-.prompt {
+.terminal-prompt {
   margin-right: 5px;
 }
-
 .terminal-input {
   background: transparent;
   border: none;
   outline: none;
   color: #0f0;
-  flex: 1;
   font-family: monospace;
-  font-size: 14px;
+  flex: 1;
 }
 </style>
 </head>
+
 <body>
 
 <header>
@@ -143,13 +154,19 @@ main {
 </div>
 
 <main>
+
+<!-- EDITOR -->
 <div id="editor-container">
+
   <div class="tabs">
-    <button class="tab active" data-tab="html"><i class="fas fa-code"></i> HTML</button>
-    <button class="tab" data-tab="js"><i class="fab fa-js-square"></i> JavaScript</button>
+    <button class="tab active" data-tab="html">
+      <i class="fas fa-code"></i> HTML
+    </button>
+    <button class="tab" data-tab="js">
+      <i class="fab fa-js-square"></i> JavaScript
+    </button>
   </div>
 
-  <!-- HTML Editor -->
   <div id="html-wrapper" class="editor-wrapper active">
     <textarea id="html-editor">
 <!DOCTYPE html>
@@ -161,28 +178,36 @@ main {
     </textarea>
   </div>
 
-  <!-- JS Terminal -->
   <div id="js-wrapper" class="editor-wrapper">
-    <div id="js-terminal"></div>
+    <textarea id="js-editor">
+console.log("JS CLI ready");
+    </textarea>
   </div>
+
 </div>
 
-<!-- Output -->
+<!-- OUTPUT -->
 <div id="output-container">
   <iframe id="preview"></iframe>
+  <div id="terminal"></div>
 </div>
+
 </main>
 
 <script>
-// CodeMirror HTML Editor
+// Initialize CodeMirror
 const htmlEditor = CodeMirror.fromTextArea(
   document.getElementById("html-editor"),
   { mode: "htmlmixed", theme: "dracula", lineNumbers: true }
 );
+const jsEditor = CodeMirror.fromTextArea(
+  document.getElementById("js-editor"),
+  { mode: "javascript", theme: "dracula", lineNumbers: true }
+);
 
-// Tab logic
 let activeTab = "html";
 
+// Tab switching
 document.querySelectorAll(".tab").forEach(tab => {
   tab.onclick = () => {
     activeTab = tab.dataset.tab;
@@ -190,74 +215,73 @@ document.querySelectorAll(".tab").forEach(tab => {
     document.querySelectorAll(".editor-wrapper").forEach(w => w.classList.remove("active"));
     tab.classList.add("active");
     document.getElementById(activeTab + "-wrapper").classList.add("active");
+
     htmlEditor.refresh();
-    if(activeTab === "html") {
-      document.getElementById("preview").style.display = "block";
-    } else {
-      document.getElementById("preview").style.display = "none";
-      initJSTerminal();
-    }
+    jsEditor.refresh();
+
+    document.getElementById("preview").style.display = activeTab === "html" ? "block" : "none";
+    document.getElementById("terminal").style.display = activeTab === "js" ? "flex" : "none";
   };
 });
 
-// Run button for HTML tab
-document.getElementById("run-btn").onclick = () => {
-  if(activeTab === "html") {
-    document.getElementById("preview").srcdoc = htmlEditor.getValue();
+// JS Terminal
+const terminal = document.getElementById("terminal");
+function addTerminalLine(text = "", isInput = false) {
+  const div = document.createElement("div");
+  div.className = "terminal-line";
+
+  if (isInput) {
+    const prompt = document.createElement("span");
+    prompt.className = "terminal-prompt";
+    prompt.textContent = "js> ";
+    const input = document.createElement("input");
+    input.className = "terminal-input";
+    input.autofocus = true;
+    input.addEventListener("keydown", handleTerminalInput);
+    div.appendChild(prompt);
+    div.appendChild(input);
+    terminal.appendChild(div);
+    input.focus();
+  } else {
+    div.textContent = text;
+    terminal.appendChild(div);
   }
-};
-
-// Custom JS Terminal
-function initJSTerminal(){
-  const term = document.getElementById("js-terminal");
-  if(term.dataset.initialized) return;
-  term.dataset.initialized = true;
-
-  function addLine(text="", isInput=false){
-    const div = document.createElement("div");
-    div.className = "terminal-line";
-    if(isInput){
-      const span = document.createElement("span");
-      span.className = "prompt";
-      span.textContent = "js> ";
-      const input = document.createElement("input");
-      input.className = "terminal-input";
-      input.autofocus = true;
-      input.addEventListener("keydown", handleInput);
-      div.appendChild(span);
-      div.appendChild(input);
-      term.appendChild(div);
-      input.focus();
-    } else {
-      div.textContent = text;
-      term.appendChild(div);
-    }
-    term.scrollTop = term.scrollHeight;
-  }
-
-  function handleInput(e){
-    if(e.key !== "Enter") return;
-    const input = e.target;
-    const line = input.value.trim();
-    input.disabled = true;
-
-    if(!line) { addLine("", true); return; }
-
-    try{
-      let result = Function('"use strict"; return (' + line + ')')();
-      addLine(String(result));
-    } catch(err){
-      addLine("Error: " + err.message);
-    }
-
-    addLine("", true);
-  }
-
-  addLine("JavaScript Terminal Active");
-  addLine("Type any JS command. Example: 2+3, console.log('hi'), Math.sqrt(16)");
-  addLine("", true);
+  terminal.scrollTop = terminal.scrollHeight;
 }
 
+function handleTerminalInput(e) {
+  if (e.key !== "Enter") return;
+  const input = e.target;
+  const code = input.value.trim();
+  input.disabled = true;
+
+  if (!code) { addTerminalLine("", true); return; }
+
+  try {
+    // Execute JS code in isolated function
+    let result = (function(){
+      return eval(code);
+    })();
+    addTerminalLine(String(result));
+  } catch(err) {
+    addTerminalLine("Error: " + err.message);
+  }
+
+  addTerminalLine("", true);
+}
+
+// Run button behavior
+document.getElementById("run-btn").onclick = () => {
+  if(activeTab === "html"){
+    document.getElementById("preview").srcdoc = htmlEditor.getValue();
+  } else {
+    // Clear terminal
+    terminal.innerHTML = "";
+    addTerminalLine("JS CLI Terminal ready. Type commands below.", false);
+    addTerminalLine("", true);
+  }
+};
 </script>
+
 </body>
 </html>
